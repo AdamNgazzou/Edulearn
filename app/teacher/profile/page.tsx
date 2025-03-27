@@ -76,30 +76,6 @@ export default function TeacherProfilePage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
-        <div className="container flex h-16 items-center justify-between">
-          <div className="flex items-center gap-2">
-            <BookOpen className="h-6 w-6" />
-            <Link href="/" className="text-xl font-bold">
-              EduLearn
-            </Link>
-          </div>
-          <nav className="hidden md:flex gap-6">
-            <Link href="/" className="text-sm font-medium transition-colors hover:text-primary">
-              Home
-            </Link>
-            <Link href="/teacher/courses" className="text-sm font-medium transition-colors hover:text-primary">
-              My Courses
-            </Link>
-            <Link href="/teacher" className="text-sm font-medium transition-colors hover:text-primary">
-              Dashboard
-            </Link>
-            <Link href="/teacher/profile" className="text-sm font-medium text-primary">
-              Profile
-            </Link>
-          </nav>
-        </div>
-      </header>
       <main className="flex-1 py-12">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col space-y-8">
@@ -282,17 +258,6 @@ export default function TeacherProfilePage() {
           </div>
         </div>
       </main>
-      <footer className="w-full border-t py-6">
-        <div className="container flex flex-col items-center justify-center gap-4 md:flex-row md:justify-between">
-          <div className="flex items-center gap-2">
-            <BookOpen className="h-5 w-5" />
-            <span className="font-semibold">EduLearn</span>
-          </div>
-          <p className="text-center text-sm text-muted-foreground md:text-left">
-            © 2024 EduLearn. All rights reserved.
-          </p>
-        </div>
-      </footer>
     </div>
   )
 }

@@ -75,33 +75,6 @@ export default function TeacherCoursesPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
-        <div className="container flex h-16 items-center justify-between">
-          <div className="flex items-center gap-2">
-            <BookOpen className="h-6 w-6" />
-            <Link href="/" className="text-xl font-bold">
-              EduLearn
-            </Link>
-          </div>
-          <nav className="hidden md:flex gap-6">
-            <Link href="/" className="text-sm font-medium transition-colors hover:text-primary">
-              Home
-            </Link>
-            <Link href="/teacher/courses" className="text-sm font-medium text-primary">
-              My Courses
-            </Link>
-            <Link href="/teacher" className="text-sm font-medium transition-colors hover:text-primary">
-              Dashboard
-            </Link>
-            <Link href="/teacher/profile" className="text-sm font-medium transition-colors hover:text-primary">
-              Profile
-            </Link>
-          </nav>
-          <Button size="sm" asChild>
-            <Link href="/teacher">Teacher Dashboard</Link>
-          </Button>
-        </div>
-      </header>
       <main className="flex-1 py-12">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col space-y-8">
@@ -131,21 +104,21 @@ export default function TeacherCoursesPage() {
                 <TabsTrigger value="draft">Drafts</TabsTrigger>
               </TabsList>
               <TabsContent value="all" className="mt-6">
-                <div className="grid gap-6 md:grid-cols-2">
+                <div className="grid gap-6 md:grid-cols-3">
                   {filteredCourses.map((course) => (
                     <TeacherCourseCard key={course.id} course={course} />
                   ))}
                 </div>
               </TabsContent>
               <TabsContent value="active" className="mt-6">
-                <div className="grid gap-6 md:grid-cols-2">
+                <div className="grid gap-6 md:grid-cols-3">
                   {filteredCourses.map((course) => (
                     <TeacherCourseCard key={course.id} course={course} />
                   ))}
                 </div>
               </TabsContent>
               <TabsContent value="draft" className="mt-6">
-                <div className="grid gap-6 md:grid-cols-2">
+                <div className="grid gap-6 md:grid-cols-3">
                   {filteredCourses.map((course) => (
                     <TeacherCourseCard key={course.id} course={course} />
                   ))}
@@ -155,17 +128,6 @@ export default function TeacherCoursesPage() {
           </div>
         </div>
       </main>
-      <footer className="w-full border-t py-6">
-        <div className="container flex flex-col items-center justify-center gap-4 md:flex-row md:justify-between">
-          <div className="flex items-center gap-2">
-            <BookOpen className="h-5 w-5" />
-            <span className="font-semibold">EduLearn</span>
-          </div>
-          <p className="text-center text-sm text-muted-foreground md:text-left">
-            © 2024 EduLearn. All rights reserved.
-          </p>
-        </div>
-      </footer>
     </div>
   )
 }
@@ -206,8 +168,10 @@ function TeacherCourseCard({ course }) {
         </div>
       </CardContent>
       <CardFooter className="flex gap-2">
+      
+
         <Button className="flex-1" variant="outline">
-          Edit Course
+          <Link href={`/teacher/courses/${course.id}`}>Edit Course</Link>
         </Button>
         <Button className="flex-1" asChild>
           <Link href={`/teacher/students/${course.id}`}>View Students</Link>

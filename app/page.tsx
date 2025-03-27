@@ -22,6 +22,9 @@ export default function LandingPage() {
             <Link href="/teacher" className="text-sm font-medium transition-colors hover:text-primary">
               Teacher
             </Link>
+            <Link href="/admin" className="text-sm font-medium transition-colors hover:text-primary">
+              Admin
+            </Link>
           </nav>
           <div className="flex items-center gap-4">
             <Button variant="outline" size="sm">
