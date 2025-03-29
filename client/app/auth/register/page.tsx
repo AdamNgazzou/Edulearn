@@ -82,7 +82,7 @@ export default function SignUpPage() {
             </Link>
           </div>
           <Button size="sm" variant="outline" asChild>
-            <Link href="/auth/signin">Sign in</Link>
+            <Link href="/auth/login">Sign in</Link>
           </Button>
         </div>
       </header>
@@ -256,7 +256,7 @@ export default function SignUpPage() {
           <CardFooter className="flex justify-center">
             <div className="text-center text-sm text-muted-foreground">
               Already have an account?{" "}
-              <Link href="/auth/signin" className="text-primary hover:underline">
+              <Link href="/auth/login" className="text-primary hover:underline">
                 Sign in
               </Link>
             </div>

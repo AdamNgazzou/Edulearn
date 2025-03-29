@@ -28,9 +28,15 @@ export default function LandingPage() {
           </nav>
           <div className="flex items-center gap-4">
             <Button variant="outline" size="sm">
-              Log in
+              <Link href="/auth/login" className="text-sm font-medium transition-colors hover:text-primary">
+                Log in
+              </Link>
             </Button>
-            <Button size="sm">Sign up</Button>
+            <Button size="sm">
+              <Link href="/auth/register" className="text-sm font-medium transition-colors hover:text-primary">
+                Sign up
+              </Link>
+            </Button>
           </div>
         </div>
       </header>
