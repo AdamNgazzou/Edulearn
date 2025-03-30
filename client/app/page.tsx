@@ -1,9 +1,31 @@
+'use client'
+import { useEffect, useState } from "react";
 import Link from "next/link"
 import Image from "next/image"
 import { ArrowRight, BookOpen, Users, Award } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export default function LandingPage() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [role, setRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Helper function to get a cookie value by name
+    const getCookie = (name: string) => {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop()?.split(";").shift();
+      return null;
+    };
+
+    // Check if a token exists in cookies
+    const token = getCookie("token");
+    const userRole = getCookie("role");
+
+    setIsLoggedIn(!!token); // Set `isLoggedIn` to true if token exists
+    setRole(userRole ?? null); // Set the role from cookies, defaulting undefined to null
+  }, []);
+  
   return (
     <div className="flex min-h-screen flex-col">
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
@@ -16,27 +38,32 @@ export default function LandingPage() {
             <Link href="/" className="text-sm font-medium transition-colors hover:text-primary">
               Home
             </Link>
-            <Link href="/student" className="text-sm font-medium transition-colors hover:text-primary">
-              Student
-            </Link>
-            <Link href="/teacher" className="text-sm font-medium transition-colors hover:text-primary">
-              Teacher
-            </Link>
-            <Link href="/admin" className="text-sm font-medium transition-colors hover:text-primary">
-              Admin
-            </Link>
+
           </nav>
           <div className="flex items-center gap-4">
-            <Button variant="outline" size="sm">
-              <Link href="/auth/login" className="text-sm font-medium transition-colors hover:text-primary">
-                Log in
-              </Link>
-            </Button>
-            <Button size="sm">
-              <Link href="/auth/register" className="text-sm font-medium transition-colors hover:text-primary">
-                Sign up
-              </Link>
-            </Button>
+            {!isLoggedIn ? (
+              <>
+                <Button variant="outline" size="sm">
+                  <Link href="/auth/login" className="text-sm font-medium transition-colors hover:text-primary">
+                    Log in
+                  </Link>
+                </Button>
+                <Button size="sm">
+                  <Link href="/auth/register" className="text-sm font-medium transition-colors hover:text-primary">
+                    Sign up
+                  </Link>
+                </Button>
+              </>
+            ) : (
+              <Button variant="outline" size="sm" onClick={() => {
+                localStorage.removeItem("token"); // Log out by removing the token
+                localStorage.removeItem("roles"); // Log out by removing the role
+
+                setIsLoggedIn(false); // Update state
+              }}>
+                Log out
+              </Button>
+            )}
           </div>
         </div>
       </header>
