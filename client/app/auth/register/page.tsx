@@ -239,67 +239,105 @@ export default function SignUpPage() {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
+    e.preventDefault();
+  
     if (!agreeTerms) {
       toast({
         title: "Terms and Conditions",
         description: "Please agree to the terms and conditions",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
-
+  
     // Final validation of all required fields
-    const errors: Record<string, string> = {}
-
-    if (!formData.name.trim()) errors.name = "Name is required"
-    if (!formData.email.trim()) errors.email = "Email is required"
-    if (!formData.password.trim()) errors.password = "Password is required"
-
+    const errors: Record<string, string> = {};
+  
+    if (!formData.name.trim()) errors.name = "Name is required";
+    if (!formData.email.trim()) errors.email = "Email is required";
+    if (!formData.password.trim()) errors.password = "Password is required";
+  
     if (role === "student" && !formData.program.trim()) {
-      errors.program = "Program is required"
+      errors.program = "Program is required";
     }
-
+  
     if (role === "teacher" && !formData.department.trim()) {
-      errors.department = "Department is required"
+      errors.department = "Department is required";
     }
-
+  
     if (Object.keys(errors).length > 0) {
-      setFormErrors(errors)
+      setFormErrors(errors);
       toast({
         title: "Please fix the errors",
         description: "Some required fields are missing or invalid",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
-
-    setIsLoading(true)
-
-    // Combine all form data
-    const completeFormData = {
-      ...formData,
+  
+    setIsLoading(true);
+  
+    // Conditionally include fields based on role
+    let completeFormData: Record<string, any> = {
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
       role,
-      // Teacher-specific data
-      expertise: role === "teacher" ? expertise : [],
-      education: role === "teacher" ? education : [],
-      // Student-specific data
-      interests: role === "student" ? interests : [],
-      achievements: role === "student" ? achievements : [],
-      avatar: avatarPreview,
+      phone: formData.phone || null,
+      location: formData.location || null,
+      bio: formData.bio || null,
+    };
+  
+    if (role === "student") {
+      completeFormData = {
+        ...completeFormData,
+        program: formData.program,
+        interests,
+        achievements,
+      };
+    } else if (role === "teacher") {
+      completeFormData = {
+        ...completeFormData,
+        department: formData.department,
+        expertise,
+        education,
+      };
     }
-
-    console.log("Form submitted with data:", completeFormData)
-
-    // Simulate registration delay
-    setTimeout(() => {
-      setIsLoading(false)
+    console.log("completeformdata",completeFormData);
+    try {
+      const response = await fetch("http://localhost:3001/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(completeFormData),
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to register");
+      }
+  
+      const data = await response.json();
+      toast({
+        title: "Account created",
+        description: "Your account has been successfully created!",
+        variant: "default",
+      });
+  
       // Redirect based on role
-      window.location.href = role === "teacher" ? "/teacher" : "/student"
-    }, 1500)
-  }
-
+      window.location.href = role === "teacher" ? "/teacher" : "/student";
+    } catch (error: any) {
+      console.error("Registration error:", error);
+      toast({
+        title: "Registration failed",
+        description: error.message || "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
   return (
     <div className="flex min-h-screen flex-col">
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
