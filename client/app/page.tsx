@@ -25,7 +25,7 @@ export default function LandingPage() {
     setIsLoggedIn(!!token); // Set `isLoggedIn` to true if token exists
     setRole(userRole ?? null); // Set the role from cookies, defaulting undefined to null
   }, []);
-  
+
   return (
     <div className="flex min-h-screen flex-col">
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
@@ -38,7 +38,43 @@ export default function LandingPage() {
             <Link href="/" className="text-sm font-medium transition-colors hover:text-primary">
               Home
             </Link>
-
+            {role === "student" && (
+              <>
+                <Link href="/student" className="text-sm font-medium text-primary">
+                  Dashboard
+                </Link>
+                <Link href="/student/courses" className="text-sm font-medium transition-colors hover:text-primary">
+                  My Courses
+                </Link>
+                <Link href="/student/teachers" className="text-sm font-medium transition-colors hover:text-primary">
+                  My Teachers
+                </Link>
+                <Link href="/student/profile" className="text-sm font-medium transition-colors hover:text-primary">
+                  Profile
+                </Link>
+              </>
+            )}
+            {role === "teacher" && (
+              <>
+                <Link href="/teacher" className="text-sm font-medium text-primary">
+                  Dashboard
+                </Link>
+                <Link href="/teacher/courses" className="text-sm font-medium transition-colors hover:text-primary">
+                  My Courses
+                </Link>
+                <Link href="/teacher/students" className="text-sm font-medium transition-colors hover:text-primary">
+                  My Students
+                </Link>
+                <Link href="/teacher/profile" className="text-sm font-medium transition-colors hover:text-primary">
+                  Profile
+                </Link>
+              </>
+            )}
+            {role === "admin" && (
+              <Link href="/admin" className="text-sm font-medium text-primary">
+                Admin Dashboard
+              </Link>
+            )}
           </nav>
           <div className="flex items-center gap-4">
             {!isLoggedIn ? (
@@ -55,12 +91,22 @@ export default function LandingPage() {
                 </Button>
               </>
             ) : (
-              <Button variant="outline" size="sm" onClick={() => {
-                localStorage.removeItem("token"); // Log out by removing the token
-                localStorage.removeItem("roles"); // Log out by removing the role
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  // Clear cookies by setting them to expire in the past
+                  document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+                  document.cookie = "role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+                  
+                  // Update state
+                  setIsLoggedIn(false);
+                  setRole(null);
 
-                setIsLoggedIn(false); // Update state
-              }}>
+                  // Optionally redirect to the home page or login page
+                  window.location.href = "/";
+                }}
+              >
                 Log out
               </Button>
             )}
