@@ -25,7 +25,7 @@ export function middleware(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith("/teacher")) {
     console.log("Accessing teacher route");
     // If the role is not "teacher", redirect to the home page
-    if (role !== "teacher") {
+    if (role !== "instructor") {
       console.log("Unauthorized access to teacher route. Redirecting...");
       return NextResponse.redirect(new URL("/", request.url));
     }

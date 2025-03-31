@@ -198,7 +198,9 @@ export default function LandingPage() {
               </div>
               <div className="mx-auto w-full max-w-sm space-y-2">
                 <Button className="w-full" size="lg">
-                  Sign Up Now
+                  <Link href="/auth/register" className="text-sm font-medium transition-colors hover:text-primary">
+                    Sign Up Now
+                  </Link>
                 </Button>
                 <p className="text-xs text-muted-foreground">
                   By signing up, you agree to our Terms of Service and Privacy Policy.

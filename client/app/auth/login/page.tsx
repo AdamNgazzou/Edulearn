@@ -48,7 +48,7 @@ export default function SignInPage() {
       // Redirect based on the user's role
       if (data.user.role === "student") {
         window.location.href = "/student";
-      } else if (data.user.role === "teacher") {
+      } else if (data.user.role === "instructor") {
         window.location.href = "/teacher";
       } else if (data.user.role === "admin") {
         window.location.href = "/admin";

@@ -53,7 +53,7 @@ export default function StudentProfilePage() {
   const [isEditing, setIsEditing] = useState(false)
   const [profile, setProfile] = useState(studentProfile)
   const [tempProfile, setTempProfile] = useState(studentProfile)
-
+  
   const handleEdit = () => {
     setTempProfile(profile)
     setIsEditing(true)
