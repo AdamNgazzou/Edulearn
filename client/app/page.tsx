@@ -79,16 +79,18 @@ export default function LandingPage() {
           <div className="flex items-center gap-4">
             {!isLoggedIn ? (
               <>
-                <Button variant="outline" size="sm">
-                  <Link href="/auth/login" className="text-sm font-medium transition-colors hover:text-primary">
-                    Log in
-                  </Link>
-                </Button>
-                <Button size="sm">
-                  <Link href="/auth/register" className="text-sm font-medium transition-colors hover:text-primary">
-                    Sign up
-                  </Link>
-                </Button>
+                <Link href="/auth/login" className="text-sm font-medium transition-colors hover:text-primary">
+                  <Button variant="outline" size="sm">
+                      Log in
+                  </Button>
+                </Link>
+
+                <Link href="/auth/register" className="text-sm font-medium transition-colors hover:text-primary">
+                  <Button size="sm">
+                      Sign up
+                  </Button>
+                </Link>
+
               </>
             ) : (
               <Button

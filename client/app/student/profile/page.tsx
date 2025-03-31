@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useState } from "react"
 import Link from "next/link"
@@ -24,7 +24,6 @@ const studentProfile = {
   bio: "Computer Science student passionate about web development and artificial intelligence. Looking to expand my knowledge in full-stack development.",
   program: "Bachelor of Science in Computer Science",
   enrollmentDate: "September 2022",
-  expectedGraduation: "May 2026",
   interests: ["Web Development", "Machine Learning", "Mobile Apps", "UI/UX Design"],
   achievements: [
     {
@@ -78,7 +77,6 @@ export default function StudentProfilePage() {
     bio: string
     program: string
     enrollmentDate: string
-    expectedGraduation: string
     interests: string[]
     achievements: Achievement[]
     enrolledCourses: Course[]
@@ -154,7 +152,7 @@ export default function StudentProfilePage() {
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <GraduationCap className="h-4 w-4 text-muted-foreground" />
-                      <span>Expected graduation: {profile.expectedGraduation}</span>
+                      <span>Enrollment Date : {profile.enrollmentDate}</span>
                     </div>
                   </CardContent>
                   <CardFooter>

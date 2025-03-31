@@ -53,7 +53,7 @@ export default function SignUpPage() {
     password: "",
     phone: "",
     location: "",
-
+    image_url: "",
     // Professional info (for teachers)
     bio: "",
     department: "",
@@ -156,10 +156,15 @@ export default function SignUpPage() {
       const reader = new FileReader()
       reader.onloadend = () => {
         setAvatarPreview(reader.result as string)
+        setFormData((prevData) => ({
+          ...prevData,
+          image_url: reader.result as string, // Store Base64 URL, not the File object
+        }))
       }
       reader.readAsDataURL(file)
     }
   }
+  
 
   const validateCurrentStep = (): boolean => {
     const errors: Record<string, string> = {}
@@ -286,6 +291,7 @@ export default function SignUpPage() {
       phone: formData.phone || null,
       location: formData.location || null,
       bio: formData.bio || null,
+      image_url: null,
     };
   
     if (role === "student") {
@@ -348,9 +354,11 @@ export default function SignUpPage() {
               EduLearn
             </Link>
           </div>
-          <Button size="sm" variant="outline" asChild>
-            <Link href="/auth/register">Sign in</Link>
-          </Button>
+          <Link href="/auth/login">
+            <Button size="sm" variant="outline" >
+              Sign in
+            </Button>
+          </Link>
         </div>
       </header>
 
@@ -556,7 +564,7 @@ export default function SignUpPage() {
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
-                        <Input id="avatar" type="file" accept="image/*" onChange={handleAvatarChange} />
+                        <Input id="avatar" type="file" accept="image/*" onChange={handleAvatarChange}  />
                         <p className="text-xs text-muted-foreground mt-1">Upload a profile picture (optional)</p>
                       </div>
                     </div>

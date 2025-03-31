@@ -44,6 +44,8 @@ export default function SignInPage() {
       // Save the token and role in cookies
       document.cookie = `token=${data.token}; path=/;`;
       document.cookie = `role=${data.user.role}; path=/;`;
+      document.cookie = `id=${data.user.id}; path=/;`;
+
   
       // Redirect based on the user's role
       if (data.user.role === "student") {
@@ -70,9 +72,11 @@ export default function SignInPage() {
               EduLearn
             </Link>
           </div>
-          <Button size="sm" variant="outline" asChild>
-            <Link href="/auth/register">Create an account</Link>
-          </Button>
+          <Link href="/auth/register">
+            <Button size="sm" variant="outline" >
+              Create an account
+            </Button>
+          </Link>
         </div>
       </header>
 
