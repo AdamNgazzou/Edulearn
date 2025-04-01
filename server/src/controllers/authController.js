@@ -97,7 +97,14 @@ exports.login = async (req, res) => {
     }
 
     try {
-        const userQuery = "SELECT * FROM users WHERE email = $1";
+        const userQuery = `
+        SELECT COALESCE(s.id, i.id, a.id) AS id, u.name,u.email,u.role,u.password_hash
+        FROM users u
+        LEFT JOIN students s ON u.id = s.user_id
+        LEFT JOIN instructors i ON u.id = i.user_id
+        LEFT JOIN admins a ON u.id = a.user_id
+        WHERE u.email = $1;
+        `;
         const userResult = await db.query(userQuery, [email]);
 
         if (userResult.rows.length === 0) {
@@ -125,6 +132,7 @@ exports.login = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 role: user.role
+
             }
         });
     } catch (error) {

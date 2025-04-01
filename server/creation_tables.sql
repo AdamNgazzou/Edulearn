@@ -1,134 +1,184 @@
-create table users (
-  id bigint primary key generated always as identity,
-  name text not null,
-  email text not null unique,
-  password_hash text not null,
-  role text not null check (role in ('student', 'instructor', 'admin')),
-  phone text,
-  location text,
-  bio text,
-  created_at timestamp default current_timestamp,
-  updated_at timestamp default current_timestamp
+-- Text to SQL original prompt:
+-- write sql for creation of all tables in my database
+-- 
+CREATE TABLE users (
+    id bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+    name text NOT NULL,
+    email text NOT NULL UNIQUE,
+    password_hash text NOT NULL,
+    role text NOT NULL CHECK (role IN ('student', 'instructor', 'admin')),
+    phone text,
+    location text,
+    bio text,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    image_url text,
+    PRIMARY KEY (id)
 );
 
-create table instructors (
-  id bigint primary key generated always as identity,
-  user_id bigint references users (id) on delete cascade,
-  bio text,
-  expertise text[],
-  department text
+CREATE TABLE students (
+    id bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+    user_id bigint,
+    enrollment_date date DEFAULT CURRENT_DATE,
+    program text,
+    PRIMARY KEY (id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
-create table education (
-  id bigint primary key generated always as identity,
-  instructor_id bigint references instructors (id) on delete cascade,
-  degree text not null,
-  institution text not null,
-  year int not null
+CREATE TABLE instructors (
+    id bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+    user_id bigint,
+    bio text,
+    expertise text[],
+    department text,
+    PRIMARY KEY (id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
-create table courses (
-  id bigint primary key generated always as identity,
-  title text not null,
-  description text,
-  category text,
-  level text,
-  duration interval,
-  price numeric(10, 2),
-  is_published boolean default false,
-  created_at timestamp default current_timestamp,
-  updated_at timestamp default current_timestamp,
-  image_url text,
-  instructor_id bigint references instructors (id) on delete set null
+CREATE TABLE admins (
+    id bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+    user_id bigint,
+    PRIMARY KEY (id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
-create table students (
-  id bigint primary key generated always as identity,
-  user_id bigint references users (id) on delete cascade,
-  enrollment_date date default current_date,
-  program text,
-  interests text[]
+CREATE TABLE courses (
+    id bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+    title text NOT NULL,
+    description text,
+    category text,
+    level text,
+    duration text,
+    price numeric(10,2),
+    is_published boolean DEFAULT false,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    image_url text,
+    instructor_id bigint,
+    PRIMARY KEY (id),
+    FOREIGN KEY (instructor_id) REFERENCES instructors(id) ON DELETE SET NULL
 );
 
-create table achievements (
-  id bigint primary key generated always as identity,
-  student_id bigint references students (id) on delete cascade,
-  title text not null,
-  date date not null,
-  description text
+CREATE TABLE modules (
+    id bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+    course_id bigint,
+    title text NOT NULL,
+    description text,
+    is_published boolean DEFAULT false,
+    PRIMARY KEY (id),
+    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
 );
 
-create table enrollments (
-  id bigint primary key generated always as identity,
-  student_id bigint references students (id) on delete cascade,
-  course_id bigint references courses (id) on delete cascade,
-  progress int default 0,
-  enrolled_at timestamp default current_timestamp
+CREATE TABLE lessons (
+    id bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+    module_id bigint,
+    title text NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (module_id) REFERENCES modules(id) ON DELETE CASCADE
 );
 
-create table modules (
-  id bigint primary key generated always as identity,
-  course_id bigint references courses (id) on delete cascade,
-  title text not null,
-  description text,
-  is_published boolean default false
+CREATE TABLE text_lessons (
+    id bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+    lesson_id bigint,
+    description text NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (lesson_id) REFERENCES lessons(id) ON DELETE CASCADE
 );
 
-create table lessons (
-  id bigint primary key generated always as identity,
-  module_id bigint references modules (id) on delete cascade,
-  title text not null
+CREATE TABLE video_lessons (
+    id bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+    lesson_id bigint,
+    url text NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (lesson_id) REFERENCES lessons(id) ON DELETE CASCADE
 );
 
-create table resources (
-  id bigint primary key generated always as identity,
-  course_id bigint references courses (id) on delete cascade,
-  title text not null,
-  type text check (type in ('file', 'link', 'github')) not null,
-  url text null
+CREATE TABLE assignment_lessons (
+    id bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+    lesson_id bigint,
+    description text NOT NULL,
+    instructions text,
+    points integer NOT NULL,
+    due_date date,
+    PRIMARY KEY (id),
+    FOREIGN KEY (lesson_id) REFERENCES lessons(id) ON DELETE CASCADE
 );
 
-create table announcements (
-  id bigint primary key generated always as identity,
-  course_id bigint references courses (id) on delete cascade,
-  title text not null,
-  content text,
-  created_at timestamp default current_timestamp
+CREATE TABLE enrollments (
+    id bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+    student_id bigint,
+    course_id bigint,
+    progress integer DEFAULT 0,
+    enrolled_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
 );
 
-create table admins (
-  id bigint primary key generated always as identity,
-  user_id bigint references users (id) on delete cascade
+CREATE TABLE announcements (
+    id bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+    course_id bigint,
+    title text NOT NULL,
+    content text,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
 );
 
-create table video_lessons (
-  id bigint primary key generated always as identity,
-  lesson_id bigint references lessons (id) on delete cascade,
-  url text not null
+CREATE TABLE resources (
+    id bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+    course_id bigint,
+    title text NOT NULL,
+    type text NOT NULL CHECK (type IN ('file', 'link', 'github')),
+    url text,
+    PRIMARY KEY (id),
+    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
 );
 
-create table text_lessons (
-  id bigint primary key generated always as identity,
-  lesson_id bigint references lessons (id) on delete cascade,
-  description text not null
+CREATE TABLE attendance (
+    id bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+    student_id bigint NOT NULL,
+    course_id bigint NOT NULL,
+    attended_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    status text CHECK (status IN ('present', 'absent', 'late')),
+    PRIMARY KEY (id),
+    UNIQUE (student_id, course_id, attended_at),
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
 );
 
-create table assignment_lessons (
-  id bigint primary key generated always as identity,
-  lesson_id bigint references lessons (id) on delete cascade,
-  description text not null,
-  instructions text,
-  points int not null,
-  due_date date
+CREATE TABLE achievements (
+    id bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+    student_id bigint,
+    title text NOT NULL,
+    date date NOT NULL,
+    description text,
+    PRIMARY KEY (id),
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
 );
 
-create table attendance (
-  id bigint primary key generated always as identity,
-  student_id bigint not null references students (id) on delete cascade,
-  course_id bigint not null references courses (id) on delete cascade,
-  attended_at timestamp default current_timestamp,
-  status text check (status in ('present', 'absent', 'late')),
-  unique (student_id, course_id, attended_at)
+CREATE TABLE education (
+    id bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+    instructor_id bigint,
+    degree text NOT NULL,
+    institution text NOT NULL,
+    year integer NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (instructor_id) REFERENCES instructors(id) ON DELETE CASCADE
+);
+
+CREATE TABLE interests (
+    id bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
+    title text NOT NULL,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE student_interests (
+    student_id bigint NOT NULL,
+    interest_id bigint NOT NULL,
+    PRIMARY KEY (student_id, interest_id),
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+    FOREIGN KEY (interest_id) REFERENCES interests(id) ON DELETE CASCADE
 );
 
 create index idx_enrollments_course_id on enrollments(course_id);

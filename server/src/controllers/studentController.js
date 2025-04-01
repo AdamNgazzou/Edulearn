@@ -147,3 +147,60 @@ exports.getProfileOfStudent = async (req, res) => {
         if (client) client.release(); // Ensure the connection is released
     }
 };
+
+exports.getCoursesProfileStudent = async (req, res) => {
+    // get all courses completed and not completed of a signle student by his id /student/teacher/:id
+    let client;
+    const studentId = req.params.id;
+
+    // Validate input
+    if (!studentId || isNaN(studentId) || studentId <= 0) {
+        return res.status(400).json({ success: false, message: "Invalid student ID" });
+    }
+
+    try {
+        client = await db.connect();
+
+        // Query to completed course data for the student
+        const query = `
+            SELECT c.id , c.title , i.id , u.name , AVG(sa.grade) AS grade
+            FROM courses c
+            JOIN enrollments e ON c.id = e.course_id
+            JOIN instructors i ON c.instructor_id = i.id
+            JOIN users u ON i.user_id = u.id
+            LEFT JOIN assignment_lessons al ON al.lesson_id IN (SELECT l.id FROM lessons l JOIN modules m ON l.module_id = m.id WHERE m.course_id = c.id)
+            LEFT JOIN student_assignments sa ON sa.assignment_id = al.id AND sa.student_id = e.student_id
+            WHERE e.student_id = $1 AND e.progress = 100
+            GROUP BY c.id, c.title, i.id, u.name
+        `;
+        const completedCoursesResult = await client.query(query, [studentId]);
+        const completedCourses = completedCoursesResult.rows;
+
+        // Query to incompleted course data for the student
+        const query2 = `
+            SELECT c.id, c.title, e.progress, i.id AS instructorid, u.name AS instructorname, 
+                SUM(e.progress) OVER () AS total_progress
+            FROM enrollments e
+            JOIN courses c ON e.course_id = c.id
+            JOIN instructors i ON c.instructor_id = i.id
+            JOIN users u ON i.user_id = u.id
+            WHERE e.student_id = $1 AND e.progress < 100
+        `;
+        const inCompletedCoursesResult = await client.query(query2, [studentId]);
+        const inCompletedCourses = inCompletedCoursesResult.rows;
+
+        // Check if  are found
+        if (inCompletedCourses.length === 0 && completedCourses.length === 0) {
+            return res.status(404).json({ success: false, message: "No data found for this student" });
+        }
+
+        // Return the data
+        res.status(200).json({ success: true, completedCourses: completedCourses, inCompletedCourses: inCompletedCourses });
+    } catch (error) {
+        console.error("Error fetching data:", error.message);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    } finally {
+        if (client) client.release(); // Ensure the connection is released
+    }
+};
+

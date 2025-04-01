@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 export function middleware(request: NextRequest) {
   console.log("Middleware triggered");
 
-  // Get the role from cookies using Next.js's request.cookies API
+  /*// Get the role from cookies using Next.js's request.cookies API
   const role = request.cookies.get("role")?.value;
   console.log("Role from cookies:", role);
 
@@ -52,5 +52,5 @@ export const config = {
     "/student/:path*", // Apply middleware to all /student/... routes
     "/teacher/:path*", // Apply middleware to all /teacher/... routes
     "/admin/:path*",   // Apply middleware to all /admin/... routes
-  ],
+  ],*/
 };

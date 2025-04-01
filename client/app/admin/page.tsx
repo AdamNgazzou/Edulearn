@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react";
 import Link from "next/link"
 import { BookOpen, Users, BookMarked, BarChart3, Settings, Bell, Search, Download, TrendingUp, TrendingDown, DollarSign, UserPlus } from 'lucide-react'
 import { Button } from "@/components/ui/button"
@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-
+import { useRouter } from "next/navigation";
 // Mock data for admin dashboard
 const dashboardData = {
   totalUsers: 2450,
@@ -95,7 +95,29 @@ const dashboardData = {
 }
 
 export default function AdminDashboardPage() {
-  const [activeTab, setActiveTab] = useState("overview")
+  const router = useRouter();
+      const [isAuthenticated, setIsAuthenticated] = useState(false);
+      useEffect(() => {
+        const getCookie = (name: string) => {
+          const value = `; ${document.cookie}`;
+          const parts = value.split(`; ${name}=`);
+          if (parts.length === 2) return parts.pop()?.split(";").shift();
+          return null;
+        };
+    
+        const token = getCookie("token");
+        const role = getCookie("role");
+        if (!token) {
+          router.push("/auth/login"); // Redirect if not authenticated
+        } else if (role !=="admin"){
+          router.push("/"); // Redirect if not student
+        }else {
+          setIsAuthenticated(true);
+        }
+      }, []);
+    
+      // Wait for authentication to resolve (Next.js will show loading.tsx automatically)
+      if (!isAuthenticated) return null;
 
   return (
     <div className="flex min-h-screen flex-col">

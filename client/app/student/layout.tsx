@@ -3,10 +3,41 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Bell, BookOpen, ArrowLeft } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 
 export default function StudentLayout({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+  const [isHydrated, setIsHydrated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+      setIsHydrated(true); // Ensures the component is only modified after hydration
+
+      const getCookie = (name: string) => {
+          const value = `; ${document.cookie}`;
+          const parts = value.split(`; ${name}=`);
+          if (parts.length === 2) return parts.pop()?.split(";").shift();
+          return null;
+      };
+
+      const token = getCookie("token");
+      const role = getCookie("role");
+
+      if (!token) {
+          router.push("/auth/login");
+      } else if (role !== "student") {
+          router.push("/");
+      } else {
+          setIsAuthenticated(true);
+      }
+  }, []);
+
+  if (!isHydrated) return null; // Avoids mismatch before hydration
+  if (!isAuthenticated) return null; // Waits for authentication
   return (
+    <>
     <div className="flex min-h-screen flex-col">
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
         <div className="container flex h-16 items-center justify-between">
@@ -72,5 +103,6 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
         </div>
       </footer>
     </div>
+    </>
   )
 }

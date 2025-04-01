@@ -11,7 +11,6 @@ import Link from "next/link"
 
 export default function CoursesPageClient({ courses1 }: { courses1: any }) {
   const [activeTab, setActiveTab] = useState("all")
-
   const filteredCourses =
     activeTab === "all"
       ? courses1.data
