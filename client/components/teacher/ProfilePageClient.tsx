@@ -11,34 +11,103 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { toast } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
+interface profile{
+  id : string
+  userid: string
+  name : string 
+  email : string 
+  phone : string 
+  location : string 
+  image_url : string 
+  bio : string 
+  expertise : string[]
+  department: string 
+  education : education[]
+  courses : courses[]
+}
+interface education {
+  degree: string 
+  institution: string
+  year : number 
+}
+interface courses{
+  id : number 
+  title : string
+}
 
-
-export default function ProfilePageClient({profileData} : {profileData : any}) {
+export default function ProfilePageClient({profileData} : {profileData : profile}) {
   const [isEditing, setIsEditing] = useState(false)
   const [profile, setProfile] = useState(profileData)
   const [tempProfile, setTempProfile] = useState(profileData)
-
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+  
   const handleEdit = () => {
     setTempProfile(profile)
     setIsEditing(true)
   }
+  const validateInputs = () => {
+    let newErrors = {};
 
-  const handleSave = () => {
-    setProfile(tempProfile)
-    setIsEditing(false)
-  }
+    if (!tempProfile.name || tempProfile.name.trim().length <= 4) {
+      newErrors.name = "Name must be more than 4 characters";
+    }
 
+    if (!tempProfile.phone || (!/^[0-9]+$/.test(tempProfile.phone) && !/^\+[0-9]+$/.test(tempProfile.phone))) {
+      newErrors.phone = "Phone must be a number or start with '+'";
+    }
+
+    if (!tempProfile.location) {
+      newErrors.location = "Location cannot be empty";
+    }
+
+    if (!tempProfile.bio) {
+      newErrors.bio = "Bio cannot be empty";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+  const handleSave = async () => {
+    if (!validateInputs()) {
+      toast.error("Please fix the errors before saving.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/user/profile/${tempProfile.userid}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(tempProfile),
+        }
+      );
+
+      if (response.ok) {
+        setProfile(tempProfile);
+        toast.success("Profile updated successfully!");
+        setIsEditing(false);
+      } else {
+        throw new Error("Failed to update profile");
+      }
+    } catch (error) {
+      toast.error(`Error: ${error.message}`);
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setTempProfile({ ...tempProfile, [name]: value });
+  };
   const handleCancel = () => {
     setIsEditing(false)
   }
 
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setTempProfile((prev) => ({
-      ...prev,
-      [name]: value,
-    }))
-  }
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -95,10 +164,13 @@ export default function ProfilePageClient({profileData} : {profileData : any}) {
                           <X className="mr-2 h-4 w-4" />
                           Cancel
                         </Button>
-                        <Button className="flex-1" onClick={handleSave}>
-                          <Save className="mr-2 h-4 w-4" />
-                          Save
-                        </Button>
+                        <Button 
+                          className="flex-1" 
+                          onClick={handleSave} 
+                          disabled={loading}
+                          >
+                          {loading ? 'Saving...' : <><Save className="mr-2 h-4 w-4" /> Save</>}
+                      </Button>
                       </div>
                     )}
                   </CardFooter>
@@ -138,10 +210,6 @@ export default function ProfilePageClient({profileData} : {profileData : any}) {
                             <div className="grid gap-2">
                               <Label htmlFor="name">Full Name</Label>
                               <Input id="name" name="name" value={tempProfile.name} onChange={handleChange} />
-                            </div>
-                            <div className="grid gap-2">
-                              <Label htmlFor="email">Email</Label>
-                              <Input id="email" name="email" value={tempProfile.email} onChange={handleChange} />
                             </div>
                             <div className="grid gap-2">
                               <Label htmlFor="phone">Phone</Label>

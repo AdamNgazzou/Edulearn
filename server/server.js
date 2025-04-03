@@ -5,6 +5,7 @@ const cors = require("cors");
 const authRoutes = require("./src/routes/authRoutes");
 const studentRoutes = require("./src/routes/studentRoutes");
 const teacherRoutes = require("./src/routes/teacherRoutes");
+const userRoutes = require("./src/routes/userRoutes");
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.use(express.json());
 app.use("/auth", authRoutes);
 app.use("/student", studentRoutes);
 app.use("/teacher", teacherRoutes);
+app.use("/user", userRoutes);
 
 
 
