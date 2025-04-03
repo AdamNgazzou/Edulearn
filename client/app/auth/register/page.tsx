@@ -193,7 +193,7 @@ export default function SignUpPage() {
         errors.program = "Program is required"
       }
 
-      if (role === "teacher" && !formData.department.trim()) {
+      if (role === "instructor" && !formData.department.trim()) {
         errors.department = "Department is required"
       }
     }
@@ -266,7 +266,7 @@ export default function SignUpPage() {
       errors.program = "Program is required";
     }
   
-    if (role === "teacher" && !formData.department.trim()) {
+    if (role === "instructor" && !formData.department.trim()) {
       errors.department = "Department is required";
     }
   
@@ -301,7 +301,7 @@ export default function SignUpPage() {
         interests,
         achievements,
       };
-    } else if (role === "teacher") {
+    } else if (role === "instructor") {
       completeFormData = {
         ...completeFormData,
         department: formData.department,
@@ -311,20 +311,20 @@ export default function SignUpPage() {
     }
     console.log("completeformdata",completeFormData);
     try {
-      const response = await fetch("http://localhost:3001/auth/register", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(completeFormData),
       });
-  
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || "Failed to register");
       }
   
       const data = await response.json();
+      console.log(data);
       toast({
         title: "Account created",
         description: "Your account has been successfully created!",
@@ -332,7 +332,7 @@ export default function SignUpPage() {
       });
   
       // Redirect based on role
-      window.location.href = role === "teacher" ? "/teacher" : "/student";
+      window.location.href = role === "instructor" ? "/teacher" : "/student";
     } catch (error: any) {
       console.error("Registration error:", error);
       toast({
@@ -369,7 +369,7 @@ export default function SignUpPage() {
             <CardDescription>
               {currentStep === 1 && "Enter your basic information to create an account"}
               {currentStep === 2 && "Tell us more about yourself"}
-              {currentStep === 3 && role === "teacher" && "Add your professional details"}
+              {currentStep === 3 && role === "instructor" && "Add your professional details"}
               {currentStep === 3 && role === "student" && "Add your academic details"}
               {currentStep === 4 && "Review your information"}
             </CardDescription>
@@ -587,9 +587,9 @@ export default function SignUpPage() {
                         </Label>
                       </div>
                       <div>
-                        <RadioGroupItem value="teacher" id="teacher" className="peer sr-only" />
+                        <RadioGroupItem value="instructor" id="instructor" className="peer sr-only" />
                         <Label
-                          htmlFor="teacher"
+                          htmlFor="instructor"
                           className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-transparent p-4 hover:bg-muted hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                         >
                           <Briefcase className="mb-3 h-6 w-6" />
@@ -605,7 +605,7 @@ export default function SignUpPage() {
               )}
 
               {/* Step 3: Role-specific Details */}
-              {currentStep === 3 && role === "teacher" && (
+              {currentStep === 3 && role === "instructor" && (
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="bio">Professional Bio</Label>
@@ -881,7 +881,7 @@ export default function SignUpPage() {
                     <div>
                       <h3 className="text-lg font-medium">{formData.name}</h3>
                       <p className="text-sm text-muted-foreground">{formData.email}</p>
-                      <Badge className="mt-1">{role === "teacher" ? "Teacher" : "Student"}</Badge>
+                      <Badge className="mt-1">{role === "instructor" ? "instructor" : "Student"}</Badge>
                     </div>
                   </div>
 
@@ -895,7 +895,7 @@ export default function SignUpPage() {
                       <p className="text-sm">{formData.location || "Not provided"}</p>
                     </div>
 
-                    {role === "teacher" && (
+                    {role === "instructor" && (
                       <>
                         <div className="space-y-1">
                           <h4 className="text-sm font-medium">Department</h4>
@@ -954,11 +954,11 @@ export default function SignUpPage() {
                     )}
 
                     <div className="space-y-1 col-span-2">
-                      <h4 className="text-sm font-medium">{role === "teacher" ? "Professional Bio" : "About Me"}</h4>
+                      <h4 className="text-sm font-medium">{role === "instructor" ? "Professional Bio" : "About Me"}</h4>
                       <p className="text-sm">{formData.bio || "Not provided"}</p>
                     </div>
 
-                    {role === "teacher" && education.length > 0 && (
+                    {role === "instructor" && education.length > 0 && (
                       <div className="space-y-2 col-span-2">
                         <h4 className="text-sm font-medium">Education</h4>
                         {education.map((edu, index) => (

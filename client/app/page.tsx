@@ -54,7 +54,7 @@ export default function LandingPage() {
                 </Link>
               </>
             )}
-            {role === "teacher" && (
+            {role === "instructor" && (
               <>
                 <Link href="/teacher" className="text-sm font-medium text-primary">
                   Dashboard

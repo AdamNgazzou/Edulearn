@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useParams } from "next/navigation"
@@ -29,6 +29,39 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+
+// YouTube Player Component
+const YouTubePlayer = ({ videoUrl }: { videoUrl: string }) => {
+  // Extract video ID from YouTube URL
+  const getYouTubeVideoId = (url: string) => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/
+    const match = url.match(regExp)
+    return match && match[2].length === 11 ? match[2] : null
+  }
+
+  const videoId = getYouTubeVideoId(videoUrl)
+
+  if (!videoId) {
+    return (
+      <div className="aspect-video bg-muted flex items-center justify-center">
+        <p className="text-muted-foreground">Invalid video URL</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="aspect-video w-full">
+      <iframe
+        className="w-full h-full"
+        src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
+        title="YouTube video player"
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      ></iframe>
+    </div>
+  )
+}
 
 // Mock course data
 const coursesData = {
@@ -69,6 +102,7 @@ const coursesData = {
             type: "video",
             duration: "15 min",
             completed: true,
+            videoUrl: "https://www.youtube.com/watch?v=FCh6AB0jTS0&t=6906s",
           },
           {
             id: "l2",
@@ -76,6 +110,7 @@ const coursesData = {
             type: "video",
             duration: "20 min",
             completed: true,
+            videoUrl: "https://www.youtube.com/watch?v=FCh6AB0jTS0&t=6906s",
           },
           {
             id: "l3",
@@ -83,6 +118,7 @@ const coursesData = {
             type: "video",
             duration: "25 min",
             completed: true,
+            videoUrl: "https://www.youtube.com/watch?v=FCh6AB0jTS0&t=6906s",
           },
           {
             id: "l4",
@@ -105,6 +141,7 @@ const coursesData = {
             type: "video",
             duration: "18 min",
             completed: true,
+            videoUrl: "https://www.youtube.com/watch?v=FCh6AB0jTS0&t=6906s",
           },
           {
             id: "l6",
@@ -112,6 +149,7 @@ const coursesData = {
             type: "video",
             duration: "22 min",
             completed: true,
+            videoUrl: "https://www.youtube.com/watch?v=FCh6AB0jTS0&t=6906s",
           },
           {
             id: "l7",
@@ -119,6 +157,7 @@ const coursesData = {
             type: "video",
             duration: "20 min",
             completed: true,
+            videoUrl: "https://www.youtube.com/watch?v=FCh6AB0jTS0&t=6906s",
           },
           {
             id: "l8",
@@ -141,6 +180,7 @@ const coursesData = {
             type: "video",
             duration: "25 min",
             completed: true,
+            videoUrl: "https://www.youtube.com/watch?v=FCh6AB0jTS0&t=6906s",
           },
           {
             id: "l10",
@@ -148,6 +188,7 @@ const coursesData = {
             type: "video",
             duration: "30 min",
             completed: true,
+            videoUrl: "https://www.youtube.com/watch?v=FCh6AB0jTS0&t=6906s",
           },
           {
             id: "l11",
@@ -155,6 +196,7 @@ const coursesData = {
             type: "video",
             duration: "28 min",
             completed: true,
+            videoUrl: "https://www.youtube.com/watch?v=FCh6AB0jTS0&t=6906s",
           },
           {
             id: "l12",
@@ -178,6 +220,7 @@ const coursesData = {
             type: "video",
             duration: "30 min",
             completed: false,
+            videoUrl: "https://www.youtube.com/watch?v=FCh6AB0jTS0&t=6906s",
           },
           {
             id: "l14",
@@ -185,6 +228,7 @@ const coursesData = {
             type: "video",
             duration: "25 min",
             completed: false,
+            videoUrl: "https://www.youtube.com/watch?v=FCh6AB0jTS0&t=6906s",
           },
           {
             id: "l15",
@@ -192,6 +236,7 @@ const coursesData = {
             type: "video",
             duration: "35 min",
             completed: false,
+            videoUrl: "https://www.youtube.com/watch?v=FCh6AB0jTS0&t=6906s",
           },
           {
             id: "l16",
@@ -199,6 +244,7 @@ const coursesData = {
             type: "video",
             duration: "40 min",
             completed: false,
+            videoUrl: "https://www.youtube.com/watch?v=FCh6AB0jTS0&t=6906s",
           },
           {
             id: "l17",
@@ -287,8 +333,36 @@ export default function CoursePage() {
   const [activeTab, setActiveTab] = useState("content")
   const [currentModuleId, setCurrentModuleId] = useState("m3")
   const [currentLessonId, setCurrentLessonId] = useState("l9")
+  const [currentLesson, setCurrentLesson] = useState<{
+    id: string
+    title: string
+    type: string
+    duration: string
+    completed: boolean
+    dueDate?: string
+    videoUrl?: string
+  } | null>(null)
 
   const course = coursesData[courseId]
+
+  // Use useEffect to update currentLesson when dependencies change
+  useEffect(() => {
+    if (course) {
+      const module = course.modules.find((m) => m.id === currentModuleId)
+      if (module) {
+        const lesson = module.lessons.find((l) => l.id === currentLessonId)
+        if (lesson) {
+          setCurrentLesson({
+            ...lesson,
+            videoUrl:
+              lesson.type === "video"
+                ? lesson.videoUrl || "https://www.youtube.com/watch?v=FCh6AB0jTS0&t=6906s"
+                : undefined,
+          })
+        }
+      }
+    }
+  }, [currentModuleId, currentLessonId, course])
 
   if (!course) {
     return (
@@ -303,10 +377,6 @@ export default function CoursePage() {
       </div>
     )
   }
-
-  // Find current module and lesson
-  const currentModule = course.modules.find((module) => module.id === currentModuleId)
-  const currentLesson = currentModule?.lessons.find((lesson) => lesson.id === currentLessonId)
 
   // Calculate total lessons and completed lessons
   const totalLessons = course.modules.reduce((sum, module) => sum + module.lessons.length, 0)
@@ -350,6 +420,12 @@ export default function CoursePage() {
   }
 
   const { nextLesson, nextModule } = findNextLesson()
+
+  // Handle lesson selection
+  const handleLessonSelect = (moduleId: string, lessonId: string) => {
+    setCurrentModuleId(moduleId)
+    setCurrentLessonId(lessonId)
+  }
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -459,7 +535,15 @@ export default function CoursePage() {
                     )}
                   </CardContent>
                   <CardFooter>
-                    <Button className="w-full" disabled={!nextLesson}>
+                    <Button
+                      className="w-full"
+                      disabled={!nextLesson}
+                      onClick={() => {
+                        if (nextLesson && nextModule) {
+                          handleLessonSelect(nextModule.id, nextLesson.id)
+                        }
+                      }}
+                    >
                       <Play className="mr-2 h-4 w-4" />
                       {nextLesson ? "Continue Learning" : "Course Completed"}
                     </Button>
@@ -548,10 +632,7 @@ export default function CoursePage() {
                                     className={`flex items-center justify-between rounded-md p-2 ${
                                       currentLessonId === lesson.id ? "bg-primary/10" : "hover:bg-muted/50"
                                     } cursor-pointer`}
-                                    onClick={() => {
-                                      setCurrentModuleId(module.id)
-                                      setCurrentLessonId(lesson.id)
-                                    }}
+                                    onClick={() => handleLessonSelect(module.id, lesson.id)}
                                   >
                                     <div className="flex items-center gap-3">
                                       <div
@@ -629,33 +710,50 @@ export default function CoursePage() {
                     <CardContent>
                       {currentLesson ? (
                         <div className="space-y-4">
-                          <div className="rounded-lg bg-muted aspect-video flex items-center justify-center">
-                            {currentLesson.type === "video" ? (
-                              <div className="text-center">
-                                <Play className="mx-auto h-12 w-12 text-muted-foreground" />
-                                <p className="mt-2 text-sm font-medium">Play Video</p>
+                          {currentLesson.type === "video" && currentLesson.videoUrl ? (
+                            <div className="space-y-4">
+                              <div className="rounded-lg overflow-hidden aspect-video">
+                                <YouTubePlayer videoUrl={currentLesson.videoUrl} />
                               </div>
-                            ) : (
-                              <div className="text-center">
-                                <FileText className="mx-auto h-12 w-12 text-muted-foreground" />
-                                <p className="mt-2 text-sm font-medium">View Assignment</p>
+                              <div>
+                                <h3 className="font-medium">{currentLesson.title}</h3>
+                                <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
+                                  <Badge variant="outline">Video</Badge>
+                                  <span>{currentLesson.duration}</span>
+                                </div>
                               </div>
-                            )}
-                          </div>
-
-                          <div>
-                            <h3 className="font-medium">{currentLesson.title}</h3>
-                            <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
-                              <Badge variant="outline">{currentLesson.type === "video" ? "Video" : "Assignment"}</Badge>
-                              <span>{currentLesson.duration}</span>
                             </div>
-                          </div>
+                          ) : (
+                            <div className="space-y-4">
+                              <div className="rounded-lg bg-muted aspect-video flex items-center justify-center">
+                                <div className="text-center">
+                                  <FileText className="mx-auto h-12 w-12 text-muted-foreground" />
+                                  <p className="mt-2 text-sm font-medium">View Assignment</p>
+                                </div>
+                              </div>
+                              <div>
+                                <h3 className="font-medium">{currentLesson.title}</h3>
+                                <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
+                                  <Badge variant="outline">Assignment</Badge>
+                                  <span>{currentLesson.duration}</span>
+                                </div>
+                              </div>
+                            </div>
+                          )}
 
                           <div className="flex items-center justify-between">
                             <Button variant="outline" size="sm" disabled={!currentLesson.completed}>
                               {currentLesson.completed ? "Completed" : "Mark as Complete"}
                             </Button>
-                            <Button size="sm" disabled={!nextLesson}>
+                            <Button
+                              size="sm"
+                              disabled={!nextLesson}
+                              onClick={() => {
+                                if (nextLesson && nextModule) {
+                                  handleLessonSelect(nextModule.id, nextLesson.id)
+                                }
+                              }}
+                            >
                               Next Lesson
                               <ChevronRight className="ml-1 h-4 w-4" />
                             </Button>
@@ -863,7 +961,6 @@ export default function CoursePage() {
           </Tabs>
         </div>
       </main>
-
     </div>
   )
 }

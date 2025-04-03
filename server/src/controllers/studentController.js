@@ -90,7 +90,7 @@ exports.getTeachersOfStudent = async (req, res) => {
     }
 };
 exports.getProfileOfStudent = async (req, res) => {
-    // get all Teachers of a signle student by his id /student/teacher/:id
+    // get profile of a student by his id
     let client;
     const studentId = req.params.id;
 
@@ -102,7 +102,7 @@ exports.getProfileOfStudent = async (req, res) => {
     try {
         client = await db.connect();
 
-        // Query to fetch teachers for the student
+        // Query to fetch 
         const query = `
         SELECT 
             u.id, 
@@ -138,7 +138,7 @@ exports.getProfileOfStudent = async (req, res) => {
             return res.status(404).json({ success: false, message: "No teachers found for this student" });
         }
 
-        // Return the Teachers
+        // Return the profile
         res.status(200).json({ success: true, data: rows });
     } catch (error) {
         console.error("Error fetching teachers:", error.message);
