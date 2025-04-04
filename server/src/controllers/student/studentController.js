@@ -1,4 +1,4 @@
-const db = require("../models/db"); // Import the database connection
+const db = require("../../models/db"); // Import the database connection
 
 exports.getCoursesOfStudent = async (req, res) => {
     // get all Courses of a signle student by his id /student/courses/:id
@@ -203,4 +203,95 @@ exports.getCoursesProfileStudent = async (req, res) => {
         if (client) client.release(); // Ensure the connection is released
     }
 };
+
+/*exports.getCourseStudent = async (req, res) => {
+    // get all course  of a signle student by his id and course id
+    let client;
+    const studentId = req.params.studentId;
+    const courseId = req.params.courseId;
+    // Validate input
+    if ((!studentId || isNaN(studentId) || studentId <= 0) || (!courseId || isNaN(courseId) || courseId <= 0)) {
+        return res.status(400).json({ success: false, message: "Invalid student ID" });
+    }
+
+    try {
+        client = await db.connect();
+
+        // Query to course for the student
+        const query = `
+        SELECT 
+    c.id AS course_id,
+    c.title AS course_title,
+    c.description AS course_description,
+    c.category,
+    c.level,
+    c.duration,
+    c.price,
+    c.is_published,
+    c.created_at,
+    c.updated_at,
+    c.image_url,
+    c.review,
+    u.name AS instructor_name,
+    i.bio AS instructor_bio,
+    i.expertise AS instructor_expertise,
+    i.department AS instructor_department,
+    (
+        SELECT json_agg(
+            json_build_object(
+                'module_id', m.id,
+                'module_title', m.title,
+                'module_description', m.description,
+                'lessons', (
+                    SELECT json_agg(
+                        json_build_object(
+                            'lesson_id', l.id,
+                            'lesson_title', l.title,
+                            'lesson_type', CASE 
+                                WHEN tl.id IS NOT NULL THEN 'text'
+                                WHEN vl.id IS NOT NULL THEN 'video'
+                                ELSE 'unknown'
+                            END,
+                            'lesson_content', COALESCE(tl.description, vl.url)
+                        )
+                    )
+                    FROM lessons l
+                    LEFT JOIN text_lessons tl ON l.id = tl.lesson_id
+                    LEFT JOIN video_lessons vl ON l.id = vl.lesson_id
+                    WHERE l.module_id = m.id
+                )
+            )
+        )
+        FROM modules m
+        WHERE m.course_id = c.id
+    ) AS modules,
+    (SELECT COUNT(*) FROM enrollments e WHERE e.course_id = c.id) AS enrollment_count
+FROM 
+    courses c
+JOIN 
+    instructors i ON c.instructor_id = i.id
+JOIN 
+    users u ON i.user_id = u.id
+JOIN 
+    enrollments e ON c.id = e.course_id
+WHERE 
+    e.student_id = $1 AND c.id = $2
+        `;
+        const { rows } = await client.query(query, [studentId, courseId]);
+
+        // Check if  are found
+        if (rows.length === 0) {
+            return res.status(404).json({ success: false, message: "No course found for this student" });
+        }
+
+        // Return the data
+        res.status(200).json({ success: true, data: rows[0], });
+    } catch (error) {
+        console.error("Error fetching course:", error.message);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    } finally {
+        if (client) client.release(); // Ensure the connection is released
+    }
+};*/
+
 

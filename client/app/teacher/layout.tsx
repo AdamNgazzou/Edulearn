@@ -65,12 +65,23 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
                 3
               </span>
             </Button>
-            <Button variant="outline" size="sm" asChild>
-              <Link href="/">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                SignOut
-              </Link>
-            </Button>
+            <Button
+                variant="outline"
+                size="sm"
+                
+                onClick={() => {
+                  // Clear cookies by setting them to expire in the past
+                  document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+                  document.cookie = "role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+                  document.cookie = "id=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+
+                  // Optionally redirect to the home page or login page
+                  window.location.href = "/";
+                }}
+              >
+               <ArrowLeft className="mr-2 h-4 w-4" />
+                Log out
+              </Button>
           </div>
         </div>
       </header>

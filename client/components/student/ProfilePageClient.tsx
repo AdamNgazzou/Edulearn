@@ -13,6 +13,9 @@ import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"
+
 interface Profile {
     id: number
     name: string
@@ -56,31 +59,77 @@ interface Profile {
 
 export default function StudentProfilePage({ profileData, profileCourses}: { profileData: Profile; profileCourses: Course}) {
   const [isEditing, setIsEditing] = useState(false)
-  const [profile, setProfile] = useState(profileData)
-  const [tempProfile, setTempProfile] = useState(profileData)
-  const handleEdit = () => {
-    setTempProfile(profile)
-    setIsEditing(true)
-  }
-
-  const handleSave = () => {
-    setProfile(tempProfile)
-    setIsEditing(false)
-  }
-
-  const handleCancel = () => {
-    setIsEditing(false)
-  }
-
+    const [profile, setProfile] = useState(profileData)
+    const [tempProfile, setTempProfile] = useState(profileData)
+    const [loading, setLoading] = useState(false);
+    const [errors, setErrors] = useState({});
+    
+    const handleEdit = () => {
+      setTempProfile(profile)
+      setIsEditing(true)
+    }
+    const validateInputs = () => {
+      let newErrors = {};
   
+      if (!tempProfile.name || tempProfile.name.trim().length <= 4) {
+        newErrors.name = "Name must be more than 4 characters";
+      }
+  
+      if (!tempProfile.phone || (!/^[0-9]+$/.test(tempProfile.phone) && !/^\+[0-9]+$/.test(tempProfile.phone))) {
+        newErrors.phone = "Phone must be a number or start with '+'";
+      }
+  
+      if (!tempProfile.location) {
+        newErrors.location = "Location cannot be empty";
+      }
+  
+      if (!tempProfile.bio) {
+        newErrors.bio = "Bio cannot be empty";
+      }
+  
+      setErrors(newErrors);
+      return Object.keys(newErrors).length === 0;
+    };
+    const handleSave = async () => {
+      if (!validateInputs()) {
+        toast.error("Please fix the errors before saving.");
+        return;
+      }
+      setLoading(true);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setTempProfile((prev) => ({
-      ...prev,
-      [name]: value,
-    }))
-  }
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/user/profile/${tempProfile.id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(tempProfile),
+          }
+        );
+  
+        if (response.ok) {
+          setProfile(tempProfile);
+          toast.success("Profile updated successfully!");
+          setIsEditing(false);
+        } else {
+          throw new Error("Failed to update profile");
+        }
+      } catch (error) {
+        toast.error(`Error: ${error.message}`);
+      }
+      setLoading(false);
+
+    };
+  
+    const handleChange = (e) => {
+      const { name, value } = e.target;
+      setTempProfile({ ...tempProfile, [name]: value });
+    };
+    const handleCancel = () => {
+      setIsEditing(false)
+    }
 
   // Calculate overall progress across all enrolled courses
   let overallProgress =
@@ -145,10 +194,13 @@ export default function StudentProfilePage({ profileData, profileCourses}: { pro
                           <X className="mr-2 h-4 w-4" />
                           Cancel
                         </Button>
-                        <Button className="flex-1" onClick={handleSave}>
-                          <Save className="mr-2 h-4 w-4" />
-                          Save
-                        </Button>
+                        <Button 
+                          className="flex-1" 
+                          onClick={handleSave} 
+                          disabled={loading}
+                          >
+                          {loading ? 'Saving...' : <><Save className="mr-2 h-4 w-4" /> Save</>}
+                      </Button>
                       </div>
                     )}
                   </CardFooter>
@@ -198,15 +250,15 @@ export default function StudentProfilePage({ profileData, profileCourses}: { pro
                         <CardTitle>About Me</CardTitle>
                       </CardHeader>
                       <CardContent>
-                        {isEditing ? (
+                      {isEditing ? (
                           <div className="space-y-4">
                             <div className="grid gap-2">
                               <Label htmlFor="name">Full Name</Label>
-                              <Input id="name" name="name" value={profileData.name} onChange={handleChange} />
+                              <Input id="name" name="name" value={tempProfile.name} onChange={handleChange} />
                             </div>
                             <div className="grid gap-2">
                               <Label htmlFor="phone">Phone</Label>
-                              <Input id="phone" name="phone" value={profileData.phone} onChange={handleChange} />
+                              <Input id="phone" name="phone" value={tempProfile.phone} onChange={handleChange} />
                             </div>
                             <div className="grid gap-2">
                               <Label htmlFor="location">Location</Label>
@@ -219,11 +271,11 @@ export default function StudentProfilePage({ profileData, profileCourses}: { pro
                             </div>
                             <div className="grid gap-2">
                               <Label htmlFor="bio">Bio</Label>
-                              <Textarea id="bio" name="bio" value={profileData.bio} onChange={handleChange} rows={5} />
+                              <Textarea id="bio" name="bio" value={tempProfile.bio} onChange={handleChange} rows={5} />
                             </div>
                           </div>
                         ) : (
-                          <p className="text-muted-foreground">{profileData.bio}</p>
+                          <p className="text-muted-foreground">{profile.bio}</p>
                         )}
                       </CardContent>
                     </Card>

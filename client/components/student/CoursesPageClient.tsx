@@ -101,7 +101,7 @@ function CourseCard({ course }: { course: any }) {
         </div>
       </CardContent>
       <CardFooter>
-      <Link href={`/student/course/${course.id}`} >
+      <Link href={`/student/courses/${course.id}`} >
         <Button className="w-full">
             {course.progress === 100 ? "View Certificate" : "Continue Learning"}
         </Button>

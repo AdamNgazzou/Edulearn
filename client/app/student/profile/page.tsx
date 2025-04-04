@@ -15,7 +15,7 @@ export default async function ProfilePage() {
 
   const response2 = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/student/profile/courses/${id}`)
   const profileCourses = await response2.json()
-  console.log(profileCourses);
+  console.log(profileData);
   return <ProfilePageClient profileData={profileData.data[0]} profileCourses={profileCourses} />
 
 }

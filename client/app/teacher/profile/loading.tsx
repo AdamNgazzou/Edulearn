@@ -53,7 +53,7 @@ export default function Loading() {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>Areas of Interest</CardTitle>
+                    <CardTitle>Areas of Expertise</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="flex flex-wrap gap-2">

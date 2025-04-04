@@ -1,4 +1,4 @@
-const db = require("../models/db"); // Import the database connection
+const db = require("../../models/db"); // Import the database connection
 
 
 exports.getProfileOfTeacher = async (req, res) => {

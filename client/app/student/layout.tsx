@@ -79,7 +79,8 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
                   // Clear cookies by setting them to expire in the past
                   document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
                   document.cookie = "role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-              
+                  document.cookie = "id=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+
                   // Optionally redirect to the home page or login page
                   window.location.href = "/";
                 }}

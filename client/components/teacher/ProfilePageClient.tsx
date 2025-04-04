@@ -75,6 +75,7 @@ export default function ProfilePageClient({profileData} : {profileData : profile
       toast.error("Please fix the errors before saving.");
       return;
     }
+    setLoading(true); 
 
     try {
       const response = await fetch(
@@ -98,6 +99,7 @@ export default function ProfilePageClient({profileData} : {profileData : profile
     } catch (error) {
       toast.error(`Error: ${error.message}`);
     }
+    setLoading(false);
   };
 
   const handleChange = (e) => {
