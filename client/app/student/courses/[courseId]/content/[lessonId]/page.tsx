@@ -1,16 +1,12 @@
-import { Suspense } from "react"
 import LessonContent from "./lesson-content"
-import LessonContentSkeleton from "./lesson-content-skeleton"
 
 export default async function LessonPage({ params }: { params: { courseId: string; lessonId: string } }) {
   const { courseId, lessonId } = params;
-  const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/student/coursemodles/8/10}`)
+  const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/student/courselesson/8/${lessonId}}`)
   const courseData = await response.json()
-  console.log("hey",courseId);
+  console.log("yuri",courseData.data);
   return (
-    <Suspense fallback={<LessonContentSkeleton />}>
       <LessonContent courseId={courseId} lessonId={lessonId} courseData={courseData.data} />
-    </Suspense>
   )
 }
 

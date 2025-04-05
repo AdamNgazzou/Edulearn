@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton"
 
-export default function LessonContentSkeleton() {
+export default function loading() {
   return (
     <div className="flex min-h-screen flex-col">
       <main className="flex-1">

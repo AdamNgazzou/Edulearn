@@ -45,7 +45,7 @@ export default function CourseHeaderClient({course}: {course : any}) {
               <div className="flex items-center">
                 <Star className="mr-1 h-4 w-4 text-yellow-500" />
                 <span>
-                  {course.rating+2} ({course.reviews+2} reviews)
+                  {course.rating} ({course.reviews} reviews)
                 </span>
               </div>
             </div>

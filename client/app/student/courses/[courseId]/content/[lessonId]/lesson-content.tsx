@@ -665,8 +665,7 @@ export default function LessonContent({courseId,lessonId , courseData}: {courseI
   const router = useRouter()
   const course = coursesData[courseId]
   const { lesson, module, nextLesson, prevLesson } = findLessonAndModule(courseId, lessonId)
-
-  if (!course || !lesson || !module) {
+  if (!courseData) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center">
         <h1 className="text-2xl font-bold">Lesson not found</h1>
@@ -698,11 +697,11 @@ export default function LessonContent({courseId,lessonId , courseData}: {courseI
                   </Link>
                 </Button>
                 <div>
-                  <h1 className="text-lg font-bold">{course.title}</h1>
+                  <h1 className="text-lg font-bold">{courseData.course_title}</h1>
                   <div className="flex items-center text-sm text-muted-foreground">
-                    <span>{module.title}</span>
+                    <span>{courseData.module_title}</span>
                     <ChevronRight className="h-4 w-4 mx-1" />
-                    <span>{lesson.title}</span>
+                    <span>{courseData.lesson_title}</span>
                   </div>
                 </div>
               </div>
@@ -711,8 +710,8 @@ export default function LessonContent({courseId,lessonId , courseData}: {courseI
                 <Button
                   variant="outline"
                   size="sm"
-                  disabled={!prevLesson}
-                  onClick={() => prevLesson && handleNavigateToLesson(prevLesson.id)}
+                  disabled={!courseData.prev_lesson_id}
+                  onClick={() => courseData.prev_lesson_id && handleNavigateToLesson(courseData.prev_lesson_id)}
                 >
                   <ChevronLeft className="mr-2 h-4 w-4" />
                   Previous
@@ -720,8 +719,8 @@ export default function LessonContent({courseId,lessonId , courseData}: {courseI
 
                 <Button
                   size="sm"
-                  disabled={!nextLesson}
-                  onClick={() => nextLesson && handleNavigateToLesson(nextLesson.id)}
+                  disabled={!courseData.next_lesson_id }
+                  onClick={() => courseData.next_lesson_id && handleNavigateToLesson(courseData.next_lesson_id)}
                 >
                   Next
                   <ChevronRight className="ml-2 h-4 w-4" />
@@ -736,14 +735,14 @@ export default function LessonContent({courseId,lessonId , courseData}: {courseI
           <div className="grid gap-6 md:grid-cols-[3fr_1fr]">
             <div className="space-y-6">
               {/* Render different content based on lesson type */}
-              {lesson.type === "video" && lesson.videoUrl ? (
-                <EnhancedVideoPlayer videoUrl={lesson.videoUrl} title={lesson.title} />
-              ) : lesson.type === "reading" ? (
-                <ReadingContent title={lesson.title} content="This is a reading lesson content." />
+              {courseData.lesson_type === "video" && courseData.video_url ? (
+                <EnhancedVideoPlayer videoUrl={courseData.video_url} title={courseData.lesson_title} />
+              ) : courseData.lesson_type === "reading" ? (
+                <ReadingContent title={courseData.lesson_title} content="This is a reading lesson content." />
               ) : (
                 <AssignmentContent
-                  title={lesson.title}
-                  dueDate={lesson.dueDate}
+                  title={courseData.lesson_title}
+                  dueDate={courseData.due_date}
                   description="In this assignment, you will create a responsive layout using CSS Flexbox and Grid. You'll implement a dashboard interface that adapts to different screen sizes."
                   requirements={[
                     "Create a responsive navigation bar using Flexbox",
@@ -812,35 +811,35 @@ export default function LessonContent({courseId,lessonId , courseData}: {courseI
                 <CardContent>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">{module.title}</span>
-                      <span className="text-sm font-medium">{module.progress}%</span>
+                      <span className="text-sm font-medium">{courseData.module_title}</span>
+                      <span className="text-sm font-medium">{courseData.progress || 0}%</span>
                     </div>
-                    <Progress value={module.progress} className="h-2" />
+                    <Progress value={courseData.progress || 0} className="h-2" />
                     <p className="text-xs text-muted-foreground">
-                      {module.lessons.filter((l) => l.completed).length} of {module.lessons.length} lessons completed
+                      {courseData.module_lessons.filter((l) => l.isCompleted).length} of {courseData.module_lessons.length} lessons completed
                     </p>
                   </div>
 
                   <div className="mt-4 space-y-2">
-                    {module.lessons.map((moduleLesson) => (
+                    {courseData.module_lessons.map((moduleLesson) => (
                       <div
-                        key={moduleLesson.id}
+                        key={moduleLesson.lesson_id}
                         className={cn(
                           "flex items-center justify-between p-2 rounded-md cursor-pointer",
-                          moduleLesson.id === lesson.id ? "bg-primary/10" : "hover:bg-muted/50",
+                          moduleLesson.lesson_id === courseData.lesson_id ? "bg-primary/10" : "hover:bg-muted/50",
                         )}
-                        onClick={() => handleNavigateToLesson(moduleLesson.id)}
+                        onClick={() => handleNavigateToLesson(moduleLesson.lesson_id)}
                       >
                         <div className="flex items-center gap-2">
                           <div
                             className={cn(
                               "rounded-md p-1.5",
-                              moduleLesson.completed
+                              moduleLesson.isCompleted
                                 ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
                                 : "bg-muted text-muted-foreground",
                             )}
                           >
-                            {moduleLesson.completed ? (
+                            {moduleLesson.isCompleted ? (
                               <CheckCircle className="h-4 w-4" />
                             ) : moduleLesson.type === "video" ? (
                               <Video className="h-4 w-4" />
@@ -848,7 +847,7 @@ export default function LessonContent({courseId,lessonId , courseData}: {courseI
                               <FileText className="h-4 w-4" />
                             )}
                           </div>
-                          <span className={cn("text-sm", moduleLesson.id === lesson.id ? "font-medium" : "")}>
+                          <span className={cn("text-sm", moduleLesson.lesson_id === courseData.lesson_id ? "font-medium" : "")}>
                             {moduleLesson.title}
                           </span>
                         </div>

@@ -8,10 +8,10 @@ import { Badge } from "@/components/ui/badge"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { coursesData } from "@/lib/course-data"
 
-export default function CourseContentPage({ courseId }: { courseId: string }) {
+export default function CourseContentPage({ courseId, courseData }: { courseId: string , courseData : any}) {
   const course = coursesData[courseId]
 
-  if (!course) {
+  if (!courseData) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center">
         <h1 className="text-2xl font-bold">Course not found</h1>
@@ -26,11 +26,20 @@ export default function CourseContentPage({ courseId }: { courseId: string }) {
   }
 
   // Calculate total lessons and completed lessons
-  const totalLessons = course.modules.reduce((sum, module) => sum + module.lessons.length, 0)
-  const completedLessons = course.modules.reduce(
-    (sum, module) => sum + module.lessons.filter((lesson) => lesson.completed).length,
-    0,
-  )
+  const totalLessons = courseData.reduce(
+    (acc, course) => acc + course.lessons.length,
+    0
+  );
+  const completedLessons = courseData.reduce(
+    (acc, course) =>
+      acc + course.lessons.filter((lesson) => lesson.isCompleted).length,
+    0
+  );
+
+  const overallProgress =
+    totalLessons > 0
+      ? Math.round((completedLessons / totalLessons) * 100)
+      : 0;
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -55,12 +64,16 @@ export default function CourseContentPage({ courseId }: { courseId: string }) {
                 <CardHeader>
                   <CardTitle>Course Content</CardTitle>
                   <CardDescription>
-                    {totalLessons} lessons • {course.duration}
+                  • {totalLessons} lessons • 
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Accordion type="single" collapsible className="w-full">
-                    {course.modules.map((module) => (
+                <Accordion type="single" collapsible className="w-full">
+                  {courseData.map((module) => {
+                    const totalLessonsPerModule = module.lessons.length;
+                    const completedLessons = module.lessons.filter((lesson) => lesson.isCompleted).length;
+                    const progress = totalLessonsPerModule > 0 ? Math.round((completedLessons / totalLessonsPerModule) * 100) : 0;
+                    return (
                       <AccordionItem key={module.id} value={module.id}>
                         <AccordionTrigger className="hover:no-underline">
                           <div className="flex flex-1 items-center justify-between pr-4">
@@ -69,10 +82,10 @@ export default function CourseContentPage({ courseId }: { courseId: string }) {
                               <p className="text-sm text-muted-foreground">{module.description}</p>
                             </div>
                             <div className="flex items-center gap-2">
-                              <Badge variant="outline">{module.lessons.length} lessons</Badge>
+                              <Badge variant="outline">{totalLessonsPerModule} lessons</Badge>
                               <div className="flex items-center gap-1">
-                                <Progress value={module.progress} className="h-2 w-16" />
-                                <span className="text-xs">{module.progress}%</span>
+                                <Progress value={progress} className="h-2 w-16" />
+                                <span className="text-xs">{progress}%</span>
                               </div>
                             </div>
                           </div>
@@ -89,12 +102,12 @@ export default function CourseContentPage({ courseId }: { courseId: string }) {
                                   <div className="flex items-center gap-3">
                                     <div
                                       className={`rounded-md p-1.5 ${
-                                        lesson.completed
+                                        lesson.isCompleted
                                           ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
                                           : "bg-muted text-muted-foreground"
                                       }`}
                                     >
-                                      {lesson.completed ? (
+                                      {lesson.isCompleted ? (
                                         <CheckCircle className="h-4 w-4" />
                                       ) : lesson.type === "video" ? (
                                         <Video className="h-4 w-4" />
@@ -109,14 +122,14 @@ export default function CourseContentPage({ courseId }: { courseId: string }) {
                                           {lesson.type === "video"
                                             ? "Video"
                                             : lesson.type === "reading"
-                                              ? "Reading"
-                                              : "Assignment"}
+                                            ? "Reading"
+                                            : "Assignment"}
                                         </Badge>
                                         <span>{lesson.duration}</span>
-                                        {lesson.dueDate && (
+                                        {lesson.due_date && (
                                           <>
                                             <span>•</span>
-                                            <span>Due: {lesson.dueDate}</span>
+                                            <span>Due: {lesson.due_date}</span>
                                           </>
                                         )}
                                       </div>
@@ -131,9 +144,10 @@ export default function CourseContentPage({ courseId }: { courseId: string }) {
                           </div>
                         </AccordionContent>
                       </AccordionItem>
-                    ))}
-                  </Accordion>
-                </CardContent>
+                    );
+                  })}
+                </Accordion>
+              </CardContent>
               </Card>
 
               {/* Announcements */}
@@ -168,9 +182,9 @@ export default function CourseContentPage({ courseId }: { courseId: string }) {
                 <CardContent className="pb-2">
                   {/* Find the next incomplete lesson */}
                   {(() => {
-                    const nextLesson = course.modules
+                    const nextLesson = courseData
                       .flatMap((m) => m.lessons.map((l) => ({ ...l, moduleId: m.id, moduleName: m.title })))
-                      .find((l) => !l.completed)
+                      .find((l) => !l.isCompleted)
 
                     if (nextLesson) {
                       return (
@@ -217,9 +231,9 @@ export default function CourseContentPage({ courseId }: { courseId: string }) {
                   <Button className="w-full" asChild>
                     <Link
                       href={`/student/courses/${courseId}/content/${
-                        course.modules
+                        courseData
                           .flatMap((m) => m.lessons.map((l) => ({ ...l, moduleId: m.id })))
-                          .find((l) => !l.completed)?.id || course.modules[0].lessons[0].id
+                          .find((l) => !l.completed)?.id || courseData[0].lessons[0].id
                       }`}
                     >
                       <Play className="mr-2 h-4 w-4" />
@@ -235,28 +249,41 @@ export default function CourseContentPage({ courseId }: { courseId: string }) {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
+                    {/* Overall Progress */}
                     <div>
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-sm font-medium">Overall Progress</span>
-                        <span className="text-sm font-medium">{course.progress}%</span>
+                        <span className="text-sm font-medium">{overallProgress}%</span>
                       </div>
-                      <Progress value={course.progress} className="h-2" />
+                      <Progress value={overallProgress} className="h-2" />
                       <p className="text-xs text-muted-foreground mt-1">
                         {completedLessons} of {totalLessons} lessons completed
                       </p>
                     </div>
 
+                    {/* Module Progress */}
                     <div className="space-y-2">
                       <h4 className="text-sm font-medium">Module Progress</h4>
-                      {course.modules.map((module) => (
-                        <div key={module.id} className="space-y-1">
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs">{module.title}</span>
-                            <span className="text-xs">{module.progress}%</span>
+                      {courseData.map((course) => {
+                        const moduleTotal = course.lessons.length;
+                        const moduleCompleted = course.lessons.filter(
+                          (lesson) => lesson.isCompleted
+                        ).length;
+                        const moduleProgress =
+                          moduleTotal > 0
+                            ? Math.round((moduleCompleted / moduleTotal) * 100)
+                            : 0;
+
+                        return (
+                          <div key={course.id} className="space-y-1">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs">{course.title}</span>
+                              <span className="text-xs">{moduleProgress}%</span>
+                            </div>
+                            <Progress value={moduleProgress} className="h-1.5" />
                           </div>
-                          <Progress value={module.progress} className="h-1.5" />
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 </CardContent>
