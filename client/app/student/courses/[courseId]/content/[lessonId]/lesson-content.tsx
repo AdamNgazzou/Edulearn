@@ -661,13 +661,7 @@ const AssignmentContent = ({
   )
 }
 
-export default function LessonContent({
-  courseId,
-  lessonId,
-}: {
-  courseId: string
-  lessonId: string
-}) {
+export default function LessonContent({courseId,lessonId , courseData}: {courseId: string , lessonId: string, courseData:any}) {
   const router = useRouter()
   const course = coursesData[courseId]
   const { lesson, module, nextLesson, prevLesson } = findLessonAndModule(courseId, lessonId)

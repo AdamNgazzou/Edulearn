@@ -12,7 +12,7 @@ export default async function StudentLayout({ children }: { children: React.Reac
   }*/
   const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/student/course/8/10`)
   const course = await response.json()
-  console.log(course);
+  console.log("hihihi",course);
   return (
   <>
     <CourseHeaderClient course={course.data}  />

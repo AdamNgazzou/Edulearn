@@ -2,10 +2,11 @@ import { Suspense } from "react"
 import CourseContentPage from "./course-content"
 import CourseInfoSkeleton from "./course-info-skeleton"
 
-export default function CoursePage({ params }: { params: { courseId: string } }) {
+export default async function CoursePage({ params }: { params: { courseId: string } }) {
+  const {courseId} = await params;
   return (
     <Suspense fallback={<CourseInfoSkeleton />}>
-      <CourseContentPage courseId={params.courseId} />
+      <CourseContentPage courseId={courseId} />
     </Suspense>
   )
 }
