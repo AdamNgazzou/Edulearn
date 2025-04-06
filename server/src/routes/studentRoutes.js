@@ -1,6 +1,6 @@
 const express = require("express");
 const { getCoursesOfStudent, getTeachersOfStudent, getProfileOfStudent, getCoursesProfileStudent } = require("../controllers/student/studentController");
-const { getCourseStudent, getCourseInfoStudent, getCourseModLesStudent, getCourseLessonStudent } = require("../controllers/student/courseController");
+const { getCourseStudent, getCourseInfoStudent, getCourseModLesStudent, getCourseLessonStudent, PostLessonStudentCompletion } = require("../controllers/student/courseController");
 
 const router = express.Router();
 
@@ -9,6 +9,7 @@ router.get("/course/:studentId/:courseId", getCourseStudent);
 router.get("/courseinfo/:studentId/:courseId", getCourseInfoStudent);
 router.get("/coursemodles/:studentId/:courseId", getCourseModLesStudent);
 router.get("/courselesson/:studentId/:lessonId", getCourseLessonStudent);
+router.post("/lessoncomplete/:studentId/:lessonId", PostLessonStudentCompletion);
 
 
 router.get("/teachers/:id", getTeachersOfStudent);

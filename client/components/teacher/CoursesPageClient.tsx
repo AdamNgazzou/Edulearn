@@ -37,7 +37,7 @@ export default function TeacherCoursesPage({coursesData} : {coursesData: any}) {
           <div className="flex flex-col space-y-4">
           <div className="flex justify-end">
               <Button asChild className="text-sm px-6 py-2 ">
-                <Link href="/create">Create Course</Link>
+                <Link href="courses/create">Create Course</Link>
               </Button>
             </div>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">

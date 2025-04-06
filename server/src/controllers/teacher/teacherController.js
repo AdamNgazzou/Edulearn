@@ -164,10 +164,10 @@ exports.getStudentsOfAllCourses = async (req, res) => {
 exports.getStudentsOfCourse = async (req, res) => {
     // get students of a Course
     let client;
-    const studentId = req.params.id;
+    const courseId = req.params.id;
 
     // Validate input
-    if (!studentId || isNaN(studentId) || studentId <= 0) {
+    if (!courseId || isNaN(courseId) || courseId <= 0) {
         return res.status(400).json({ success: false, message: "Invalid course ID" });
     }
 
@@ -199,7 +199,7 @@ exports.getStudentsOfCourse = async (req, res) => {
         WHERE c.id = $1
         GROUP BY c.id, c.title, c.is_published, c.image_url, c.updated_at
         `;
-        const { rows } = await client.query(query, [studentId]);
+        const { rows } = await client.query(query, [courseId]);
 
         // Check if  are found
         if (rows.length === 0) {
@@ -215,3 +215,4 @@ exports.getStudentsOfCourse = async (req, res) => {
         if (client) client.release(); // Ensure the connection is released
     }
 };
+

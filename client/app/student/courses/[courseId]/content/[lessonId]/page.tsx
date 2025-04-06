@@ -14,7 +14,7 @@ export default async function LessonPage({ params }: { params: { courseId: strin
   const courseData = await response.json()
   console.log("yuri",courseData.data);
   return (
-      <LessonContent courseId={courseId} lessonId={lessonId} courseData={courseData.data} />
+      <LessonContent courseId={courseId} lessonId={lessonId} studentId={id} courseData={courseData.data}  />
   )
 }
 

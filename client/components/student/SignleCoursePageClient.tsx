@@ -10,7 +10,7 @@ import { usePathname } from "next/navigation"
 export default function CourseHeaderClient({course}: {course : any}) {
   const pathname = usePathname();
   const hideHeader = pathname.includes('/content/');
-  const progress = (course.totalcompleted/ course.totallessons)*100
+  const progress = Math.round((course.totalcompleted / course.totallessons) * 100);
   return (
     <>
     {!hideHeader && <div className="relative">

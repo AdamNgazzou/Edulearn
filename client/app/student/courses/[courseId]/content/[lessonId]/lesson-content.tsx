@@ -31,7 +31,7 @@ import {
   ExternalLink,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
@@ -382,9 +382,36 @@ const AssignmentContent = ({
   )
 }
 
-export default function LessonContent({courseId,lessonId , courseData}: {courseId: string , lessonId: string, courseData:any}) {
+export default function LessonContent({courseId,lessonId, studentId, courseData}: {courseId: string ,studentId:string, lessonId: string, courseData:any}) {
   const lessonsCompleted = courseData.module_lessons.filter((l) => l.isCompleted).length;
   const router = useRouter()
+  const [loading, setLoading] = useState(false)
+
+    const handleMarkAsComplete = async () => {
+      try {
+        setLoading(true)
+  
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/student/lessoncomplete/${studentId}/${lessonId}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+  
+        const data = await res.json()
+  
+        if (data.success) {
+          // ✅ Refresh the page after successful completion
+          window.location.reload()
+        } else {
+          console.error("Error:", data.message)
+        }
+      } catch (err) {
+        console.error("Failed to mark as complete:", err)
+      } finally {
+        setLoading(false)
+      }
+    }
   if (!courseData) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center">
@@ -574,6 +601,17 @@ export default function LessonContent({courseId,lessonId , courseData}: {courseI
                     ))}
                   </div>
                 </CardContent>
+                {!courseData.module_lessons.find((lesson: { lesson_id: string }) => lesson.lesson_id == courseData.lesson_id)?.isCompleted && (
+                  <CardFooter>
+                    <Button
+                      className="w-full"
+                      disabled={loading}
+                      onClick={handleMarkAsComplete}
+                    >
+                      {loading ? "Marking..." : "Mark as Complete"}
+                    </Button>
+                </CardFooter>
+                )}
               </Card>
 
               {/* Course Navigation */}

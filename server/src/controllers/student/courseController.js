@@ -357,3 +357,36 @@ exports.getCourseLessonStudent = async (req, res) => {
         if (client) client.release(); // Ensure the connection is released
     }
 };
+
+exports.PostLessonStudentCompletion = async (req, res) => {
+    let client;
+    const lessonId = parseInt(req.params.lessonId);
+    const studentId = parseInt(req.params.studentId);
+
+    // Validate input
+    if (isNaN(lessonId) || lessonId <= 0 || isNaN(studentId) || studentId <= 0) {
+        return res.status(400).json({ success: false, message: "Invalid lesson ID or student ID" });
+    }
+
+    try {
+        client = await db.connect();
+
+        const query = `
+        INSERT INTO student_lesson_progress (student_id, lesson_id, iscompleted)
+        VALUES ($1, $2, TRUE)
+        ON CONFLICT (student_id, lesson_id)
+        DO UPDATE SET iscompleted = TRUE
+        RETURNING *;
+      `;
+
+        // Correct order: studentId is $1, lessonId is $2
+        const { rows } = await client.query(query, [studentId, lessonId]);
+
+        res.status(200).json({ success: true, data: rows[0] });
+    } catch (error) {
+        console.error("Error marking lesson as complete:", error.message);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    } finally {
+        if (client) client.release();
+    }
+};

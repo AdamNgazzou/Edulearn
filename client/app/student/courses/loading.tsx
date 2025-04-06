@@ -9,9 +9,11 @@ type SkeletonCardProps = {
 
 export default function Loading() {
   const pathname = usePathname()
-  const hideHeader = pathname.includes('/content/')
 
-  if (!hideHeader) return null
+  // Only show loading if exactly on /student/courses
+  if (pathname !== '/student/courses') {
+    return null
+  }
 
   return (
     <div className="flex min-h-screen flex-col">

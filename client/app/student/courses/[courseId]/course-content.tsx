@@ -231,9 +231,9 @@ export default function CourseContentPage({ courseId, courseData }: { courseId: 
                   <Button className="w-full" asChild>
                     <Link
                       href={`/student/courses/${courseId}/content/${
-                        courseData
-                          .flatMap((m) => m.lessons.map((l) => ({ ...l, moduleId: m.id })))
-                          .find((l) => !l.completed)?.id || courseData[0].lessons[0].id
+                        courseData.flatMap((m) =>
+                          m.lessons.map((l) => ({ ...l, moduleId: m.id }))
+                        ).find((l) => !l.isCompleted)?.id || courseData[0]?.lessons[0]?.id
                       }`}
                     >
                       <Play className="mr-2 h-4 w-4" />

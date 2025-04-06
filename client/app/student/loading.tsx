@@ -1,7 +1,14 @@
+'use client'
 import { Skeleton } from "@/components/ui/skeleton"
 import { BookOpen } from "lucide-react"
+import { usePathname } from "next/navigation"
 
 export default function StudentLoading() {
+  const pathname = usePathname()
+    // Only show loading if exactly on /student/courses
+    if (pathname !== '/student') {
+      return null
+    }
   return (
     <div className="flex min-h-screen flex-col">
       {/* Header skeleton */}
