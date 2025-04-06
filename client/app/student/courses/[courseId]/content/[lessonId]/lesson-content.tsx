@@ -40,12 +40,11 @@ import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { coursesData } from "@/lib/course-data"
 import { cn } from "@/lib/utils"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select2"
 
 // Find lesson and module by lesson ID
-const findLessonAndModule = (courseId: string, lessonId: string) => {
+/*const findLessonAndModule = (courseId: string, lessonId: string) => {
   const course = coursesData[courseId]
   if (!course) return { lesson: null, module: null, nextLesson: null, prevLesson: null }
 
@@ -84,280 +83,26 @@ const findLessonAndModule = (courseId: string, lessonId: string) => {
     nextLesson,
     prevLesson,
   }
-}
+}*/
 
 // YouTube Player Component with enhanced controls
-const EnhancedVideoPlayer = ({ videoUrl, title }: { videoUrl: string; title: string }) => {
-  const [playing, setPlaying] = useState(true)
-  const [volume, setVolume] = useState(80)
-  const [showNotes, setShowNotes] = useState(false)
-  const [noteText, setNoteText] = useState("")
-  const [playbackSpeed, setPlaybackSpeed] = useState(1)
-  const [showTranscript, setShowTranscript] = useState(false)
-  const [captionsEnabled, setCaptionsEnabled] = useState(false)
-
-  // Extract video ID from YouTube URL
-  const getYouTubeVideoId = (url: string) => {
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/
-    const match = url.match(regExp)
-    return match && match[2].length === 11 ? match[2] : null
-  }
-
-  const videoId = getYouTubeVideoId(videoUrl)
-
-  if (!videoId) {
-    return (
-      <div className="aspect-video bg-muted flex items-center justify-center">
-        <p className="text-muted-foreground">Invalid video URL</p>
-      </div>
-    )
-  }
-
-  // Mock transcript data
-  const transcriptData = [
-    { time: "0:00", text: "Hello and welcome to this lesson on web development." },
-    { time: "0:15", text: "Today we'll be covering the fundamentals of HTML and CSS." },
-    { time: "0:30", text: "Let's start by understanding what HTML is and how it structures web content." },
-    { time: "1:00", text: "HTML stands for HyperText Markup Language." },
-    {
-      time: "1:15",
-      text: "It's the standard markup language for documents designed to be displayed in a web browser.",
-    },
-    { time: "1:45", text: "HTML elements are represented by tags, written using angle brackets." },
-    { time: "2:15", text: "Let's look at some examples of basic HTML tags." },
-    { time: "2:45", text: "The <html> tag is the root element of an HTML page." },
-    { time: "3:15", text: "The <head> element contains meta information about the document." },
-    { time: "3:45", text: "The <body> element contains the visible page content." },
-  ]
-
-  return (
-    <div className="space-y-4">
-      <div className="relative rounded-lg overflow-hidden bg-black">
-        <div className="aspect-video">
-          <iframe
-            className="w-full h-full"
-            src={`https://www.youtube.com/embed/${videoId}?autoplay=${playing ? 1 : 0}&cc_load_policy=${captionsEnabled ? 1 : 0}`}
-            title="YouTube video player"
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          ></iframe>
-        </div>
-
-        {/* Video Controls */}
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-          <div className="flex flex-col gap-2">
-            <Progress value={45} className="h-1" />
-
-            <div className="flex items-center justify-between text-white">
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 text-white hover:bg-white/20"
-                  onClick={() => setPlaying(!playing)}
-                >
-                  {playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-                </Button>
-
-                <div className="flex items-center gap-2">
-                  <Volume2 className="h-4 w-4" />
-                  <Slider
-                    value={[volume]}
-                    max={100}
-                    step={1}
-                    className="w-20"
-                    onValueChange={(value) => setVolume(value[0])}
-                  />
-                </div>
-
-                <span className="text-xs">4:25 / 10:30</span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-white hover:bg-white/20"
-                        onClick={() => setCaptionsEnabled(!captionsEnabled)}
-                      >
-                        <span className="text-xs font-bold">CC</span>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Captions</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-white hover:bg-white/20"
-                        onClick={() => setShowTranscript(!showTranscript)}
-                      >
-                        <FileText className="h-4 w-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Transcript</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-
-                <Select
-                  value={playbackSpeed.toString()}
-                  onValueChange={(value) => setPlaybackSpeed(Number.parseFloat(value))}
-                >
-                  <SelectTrigger className="h-8 w-16 text-white bg-transparent border-0 hover:bg-white/20">
-                    <SelectValue placeholder="Speed" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="0.5">0.5x</SelectItem>
-                    <SelectItem value="0.75">0.75x</SelectItem>
-                    <SelectItem value="1">1x</SelectItem>
-                    <SelectItem value="1.25">1.25x</SelectItem>
-                    <SelectItem value="1.5">1.5x</SelectItem>
-                    <SelectItem value="2">2x</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-white hover:bg-white/20">
-                  <Settings className="h-4 w-4" />
-                </Button>
-
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-white hover:bg-white/20">
-                  <Maximize className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="flex-1">
-          <h2 className="text-xl font-bold">{title}</h2>
-
-          <div className="flex items-center gap-4 mt-2">
-            <Button variant="outline" size="sm" onClick={() => setShowNotes(!showNotes)}>
-              {showNotes ? <X className="mr-2 h-4 w-4" /> : <MessageSquare className="mr-2 h-4 w-4" />}
-              {showNotes ? "Hide Notes" : "Take Notes"}
-            </Button>
-
-            <Button variant="outline" size="sm">
-              <Bookmark className="mr-2 h-4 w-4" />
-              Bookmark
-            </Button>
-
-            <Button variant="outline" size="sm">
-              <ThumbsUp className="mr-2 h-4 w-4" />
-              Helpful
-            </Button>
-
-            <Button variant="outline" size="sm">
-              <Share2 className="mr-2 h-4 w-4" />
-              Share
-            </Button>
-          </div>
-
-          {showNotes && (
-            <div className="mt-4 space-y-2">
-              <Textarea
-                placeholder="Take notes on this video..."
-                className="min-h-[150px]"
-                value={noteText}
-                onChange={(e) => setNoteText(e.target.value)}
-              />
-              <div className="flex justify-end">
-                <Button size="sm">Save Notes</Button>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {showTranscript && (
-          <Card className="w-full md:w-80 h-[300px] overflow-y-auto">
-            <CardHeader className="py-3">
-              <CardTitle className="text-sm font-medium">Transcript</CardTitle>
-            </CardHeader>
-            <CardContent className="px-4 py-0">
-              <div className="space-y-2">
-                {transcriptData.map((item, index) => (
-                  <div key={index} className="flex gap-2 text-sm">
-                    <span className="text-muted-foreground w-10">{item.time}</span>
-                    <p>{item.text}</p>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-      </div>
-    </div>
-  )
+const getYouTubeVideoId = (url: string) => {
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/
+  const match = url.match(regExp)
+  return match && match[2].length === 11 ? match[2] : null
 }
 
 // Reading Content Component
-const ReadingContent = ({ title, content }: { title: string; content: string }) => {
+const ReadingContent = ({ title, content ,courseData}: { title: string; content: string,courseData:any }) => {
   const [fontSize, setFontSize] = useState(16)
-  const [darkMode, setDarkMode] = useState(false)
-
-  // Mock table of contents
-  const tableOfContents = [
-    { id: "section-1", title: "Introduction" },
-    { id: "section-2", title: "Basic Concepts" },
-    { id: "section-3", title: "Advanced Techniques" },
-    { id: "section-4", title: "Practical Examples" },
-    { id: "section-5", title: "Summary" },
-  ]
-
-  // Mock content sections
-  const contentSections = [
-    {
-      id: "section-1",
-      title: "Introduction",
-      content:
-        "Welcome to this comprehensive guide on CSS layout techniques. In this reading, we'll explore various methods for positioning elements on a webpage, from basic to advanced approaches. By the end of this lesson, you'll have a solid understanding of how to create complex layouts using CSS.",
-    },
-    {
-      id: "section-2",
-      title: "Basic Concepts",
-      content:
-        "Before diving into complex layouts, it's important to understand the fundamental concepts of CSS positioning. Elements in HTML flow naturally from top to bottom in what's called the 'normal flow.' CSS allows us to modify this flow using various positioning properties.\n\nThe position property is the cornerstone of CSS positioning. It can take several values: static (default), relative, absolute, fixed, and sticky. Each value affects how an element is positioned on the page.\n\nThe display property is another crucial concept. It determines how an element behaves in the document flow. Common values include block, inline, inline-block, flex, and grid.",
-    },
-    {
-      id: "section-3",
-      title: "Advanced Techniques",
-      content:
-        "Now that we understand the basics, let's explore some advanced layout techniques.\n\nFlexbox is a one-dimensional layout method designed for laying out items in rows or columns. It's particularly useful for creating responsive designs that adapt to different screen sizes.\n\nCSS Grid is a two-dimensional layout system that allows for complex grid-based layouts. Unlike Flexbox, Grid enables precise control over both rows and columns simultaneously.\n\nMulti-column layout allows content to flow into multiple columns, similar to newspaper layouts. This can improve readability for long text passages on wide screens.",
-    },
-    {
-      id: "section-4",
-      title: "Practical Examples",
-      content:
-        "Let's look at some practical examples of these techniques in action.\n\nExample 1: Creating a card layout with Flexbox\n```css\n.card-container {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 20px;\n}\n\n.card {\n  flex: 1 1 300px;\n  padding: 20px;\n  border: 1px solid #ddd;\n  border-radius: 8px;\n}\n```\n\nExample 2: Building a dashboard layout with CSS Grid\n```css\n.dashboard {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));\n  grid-template-rows: auto;\n  gap: 20px;\n}\n\n.widget {\n  padding: 20px;\n  border-radius: 8px;\n  background-color: #f5f5f5;\n}\n```",
-    },
-    {
-      id: "section-5",
-      title: "Summary",
-      content:
-        "In this reading, we've covered various CSS layout techniques, from basic positioning to advanced methods like Flexbox and Grid. We've seen how these techniques can be applied to create responsive, complex layouts for modern web applications.\n\nRemember that the best layout method depends on your specific design requirements. Often, a combination of techniques will yield the best results. Practice implementing these methods in your own projects to gain a deeper understanding of how they work.",
-    },
-  ]
-
+  const [darkMode, setDarkMode] = useState(true)
+  const response = JSON.parse(courseData.text_sections);
   return (
     <div
       className={cn("rounded-lg overflow-hidden transition-colors", darkMode ? "bg-gray-900 text-white" : "bg-white")}
     >
       <div className="p-4 border-b flex items-center justify-between">
-        <h2 className="text-xl font-bold">{title}</h2>
+        <h2 className={cn("text-xl font-bold",  darkMode ? " text-white" : "text-black")}>{courseData.lesson_title}</h2>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <Button
@@ -379,7 +124,7 @@ const ReadingContent = ({ title, content }: { title: string; content: string }) 
           </div>
 
           <div className="flex items-center gap-2">
-            <Label htmlFor="dark-mode" className="text-sm">
+            <Label htmlFor="dark-mode" className={cn("text-sm",  darkMode ? " text-white" : "text-black")}>
               Dark Mode
             </Label>
             <Switch id="dark-mode" checked={darkMode} onCheckedChange={setDarkMode} />
@@ -405,15 +150,15 @@ const ReadingContent = ({ title, content }: { title: string; content: string }) 
             darkMode ? "bg-gray-800 border-gray-700" : "bg-gray-50 border-gray-200",
           )}
         >
-          <h3 className="font-medium mb-2">Table of Contents</h3>
+          <h3 className={cn("font-medium mb-2",  darkMode ? " text-white" : "text-black")}>Table of Contents</h3>
           <ul className="space-y-1">
-            {tableOfContents.map((section) => (
-              <li key={section.id}>
+            {response.map((section : {title:string,content:string},index:number) => (
+              <li key={index}>
                 <a
-                  href={`#${section.id}`}
+                  href={`#${index}`}
                   className={cn(
                     "block py-1 px-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700",
-                    darkMode ? "hover:bg-gray-700" : "hover:bg-gray-200",
+                    darkMode ? "hover:bg-gray-700 text-white" : "hover:bg-gray-200 text-black",
                   )}
                 >
                   {section.title}
@@ -425,18 +170,28 @@ const ReadingContent = ({ title, content }: { title: string; content: string }) 
 
         {/* Main Content */}
         <div className="flex-1 p-6 overflow-y-auto max-h-[600px]">
-          <div style={{ fontSize: `${fontSize}px` }} className="prose max-w-none dark:prose-invert">
-            {contentSections.map((section) => (
-              <div key={section.id} id={section.id} className="mb-8">
+        <div
+            style={{ fontSize: `${fontSize}px` }}
+            className={cn(
+              "prose max-w-none",
+              darkMode ? "dark:prose-invert text-white" : "text-black"
+            )}
+          >
+            {response.map((section : {title:string,content:string},index:number) => (
+              <div key={index} id={index} className="mb-8">
                 <h3 className="text-xl font-bold mb-4">{section.title}</h3>
-                {section.content.split("\n\n").map((paragraph, idx) => {
+                {section.content.split("\n\n").map((paragraph:string, idx:number) => {
                   if (paragraph.startsWith("```")) {
                     const code = paragraph.replace(/```css\n|\n```/g, "")
                     return (
                       <pre
                         key={idx}
-                        className={cn("p-4 rounded-md overflow-x-auto my-4", darkMode ? "bg-gray-800" : "bg-gray-100")}
+                        className={cn(
+                          "p-4 rounded-md overflow-x-auto my-4",
+                          darkMode ? "bg-gray-800 text-white" : "bg-gray-100 text-black"
+                        )}
                       >
+
                         <code>{code}</code>
                       </pre>
                     )
@@ -458,15 +213,10 @@ const ReadingContent = ({ title, content }: { title: string; content: string }) 
 
 // Assignment Content Component
 const AssignmentContent = ({
-  title,
-  dueDate,
-  description,
-  requirements,
+
+  courseData
 }: {
-  title: string
-  dueDate?: string
-  description: string
-  requirements: string[]
+  courseData:any
 }) => {
   const [activeTab, setActiveTab] = useState<"instructions" | "submission">("instructions")
   const [files, setFiles] = useState<File[]>([])
@@ -491,11 +241,11 @@ const AssignmentContent = ({
       <div className="p-4 bg-muted">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
           <div>
-            <h2 className="text-xl font-bold">{title}</h2>
-            {dueDate && (
+            <h2 className="text-xl font-bold">{courseData.lesson_title}</h2>
+            {courseData.due_date && (
               <div className="flex items-center text-sm text-muted-foreground mt-1">
                 <Clock className="mr-1 h-4 w-4" />
-                <span>Due: {dueDate}</span>
+                <span>Due: {courseData.due_date}</span>
               </div>
             )}
           </div>
@@ -524,13 +274,13 @@ const AssignmentContent = ({
           <div className="space-y-6">
             <div>
               <h3 className="text-lg font-medium mb-2">Description</h3>
-              <p className="text-muted-foreground">{description}</p>
+              <p className="text-muted-foreground">{courseData.assignment_description}</p>
             </div>
 
             <div>
-              <h3 className="text-lg font-medium mb-2">Requirements</h3>
+              <h3 className="text-lg font-medium mb-2">instructions</h3>
               <ul className="space-y-2 list-disc pl-5">
-                {requirements.map((req, index) => (
+                {courseData.instructions.map((req : string, index : number) => (
                   <li key={index}>{req}</li>
                 ))}
               </ul>
@@ -560,35 +310,6 @@ const AssignmentContent = ({
                     Download
                   </Button>
                 </div>
-              </div>
-            </div>
-
-            <div>
-              <h3 className="text-lg font-medium mb-2">Grading Criteria</h3>
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span>Functionality</span>
-                  <span className="font-medium">40%</span>
-                </div>
-                <Progress value={40} className="h-2" />
-
-                <div className="flex justify-between items-center">
-                  <span>Code Quality</span>
-                  <span className="font-medium">30%</span>
-                </div>
-                <Progress value={30} className="h-2" />
-
-                <div className="flex justify-between items-center">
-                  <span>Documentation</span>
-                  <span className="font-medium">20%</span>
-                </div>
-                <Progress value={20} className="h-2" />
-
-                <div className="flex justify-between items-center">
-                  <span>Creativity</span>
-                  <span className="font-medium">10%</span>
-                </div>
-                <Progress value={10} className="h-2" />
               </div>
             </div>
 
@@ -662,9 +383,8 @@ const AssignmentContent = ({
 }
 
 export default function LessonContent({courseId,lessonId , courseData}: {courseId: string , lessonId: string, courseData:any}) {
+  const lessonsCompleted = courseData.module_lessons.filter((l) => l.isCompleted).length;
   const router = useRouter()
-  const course = coursesData[courseId]
-  const { lesson, module, nextLesson, prevLesson } = findLessonAndModule(courseId, lessonId)
   if (!courseData) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center">
@@ -736,22 +456,21 @@ export default function LessonContent({courseId,lessonId , courseData}: {courseI
             <div className="space-y-6">
               {/* Render different content based on lesson type */}
               {courseData.lesson_type === "video" && courseData.video_url ? (
-                <EnhancedVideoPlayer videoUrl={courseData.video_url} title={courseData.lesson_title} />
-              ) : courseData.lesson_type === "reading" ? (
-                <ReadingContent title={courseData.lesson_title} content="This is a reading lesson content." />
+              <iframe
+                width="100%"
+                height="500"
+                style={{ borderRadius: '12px' }}
+                src={`https://www.youtube.com/embed/${getYouTubeVideoId(courseData.video_url)}`}
+                title={courseData.lesson_title}
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />          
+            ) : courseData.lesson_type === "text" ? (
+                <ReadingContent title={courseData.lesson_title} courseData={courseData} content="This is a reading lesson content." />
               ) : (
                 <AssignmentContent
-                  title={courseData.lesson_title}
-                  dueDate={courseData.due_date}
-                  description="In this assignment, you will create a responsive layout using CSS Flexbox and Grid. You'll implement a dashboard interface that adapts to different screen sizes."
-                  requirements={[
-                    "Create a responsive navigation bar using Flexbox",
-                    "Implement a grid-based dashboard layout with at least 4 widgets",
-                    "Ensure the layout works on mobile, tablet, and desktop screen sizes",
-                    "Use proper semantic HTML elements",
-                    "Include appropriate comments in your code",
-                    "Submit both HTML and CSS files",
-                  ]}
+                  courseData={courseData}
                 />
               )}
 
@@ -812,11 +531,11 @@ export default function LessonContent({courseId,lessonId , courseData}: {courseI
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium">{courseData.module_title}</span>
-                      <span className="text-sm font-medium">{courseData.progress || 0}%</span>
+                      <span className="text-sm font-medium">{(lessonsCompleted / courseData.module_lessons.length)*100}%</span>
                     </div>
-                    <Progress value={courseData.progress || 0} className="h-2" />
+                    <Progress value={(lessonsCompleted / courseData.module_lessons.length)*100} className="h-2" />
                     <p className="text-xs text-muted-foreground">
-                      {courseData.module_lessons.filter((l) => l.isCompleted).length} of {courseData.module_lessons.length} lessons completed
+                      {lessonsCompleted} of {courseData.module_lessons.length} lessons completed
                     </p>
                   </div>
 
@@ -851,7 +570,6 @@ export default function LessonContent({courseId,lessonId , courseData}: {courseI
                             {moduleLesson.title}
                           </span>
                         </div>
-                        <span className="text-xs text-muted-foreground">{moduleLesson.duration}</span>
                       </div>
                     ))}
                   </div>

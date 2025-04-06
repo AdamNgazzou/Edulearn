@@ -316,6 +316,7 @@ exports.getCourseLessonStudent = async (req, res) => {
 
             v.url AS video_url,
             t.description AS text_description,
+            t.sections AS text_sections,
             a.description AS assignment_description,
             a.instructions,
             a.points,

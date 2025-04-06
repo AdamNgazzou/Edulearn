@@ -1,6 +1,5 @@
 import { Suspense } from "react"
 import CourseInfoPage from "./course-info"
-import CourseInfoSkeleton from "../course-info-skeleton"
 
 export default async function CourseInfo({ params }: { params: { courseId: string } }) {
   const {courseId} = await params;
@@ -8,9 +7,7 @@ export default async function CourseInfo({ params }: { params: { courseId: strin
   const courseData = await response.json()
   console.log("hey",courseId);
   return (
-    <Suspense fallback={<CourseInfoSkeleton />}>
       <CourseInfoPage courseId={courseId} courseData={courseData.data} />
-    </Suspense>
   )
 }
 

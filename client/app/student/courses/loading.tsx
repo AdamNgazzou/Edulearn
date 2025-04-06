@@ -1,12 +1,18 @@
 "use client"
 
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@/components/ui/skeleton"
+import { usePathname } from "next/navigation"
 
 type SkeletonCardProps = {
-  count?: number;
-};
+  count?: number
+}
 
 export default function Loading() {
+  const pathname = usePathname()
+  const hideHeader = pathname.includes('/content/')
+
+  if (!hideHeader) return null
+
   return (
     <div className="flex min-h-screen flex-col">
       <main className="flex-1 py-12">
@@ -23,7 +29,7 @@ export default function Loading() {
         </div>
       </main>
     </div>
-  );
+  )
 }
 
 function SkeletonCard({ count = 3 }: SkeletonCardProps) {
@@ -39,5 +45,5 @@ function SkeletonCard({ count = 3 }: SkeletonCardProps) {
         </div>
       ))}
     </>
-  );
+  )
 }

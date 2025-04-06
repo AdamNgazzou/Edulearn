@@ -10,7 +10,7 @@ import { usePathname } from "next/navigation"
 export default function CourseHeaderClient({course}: {course : any}) {
   const pathname = usePathname();
   const hideHeader = pathname.includes('/content/');
-
+  const progress = (course.totalcompleted/ course.totallessons)*100
   return (
     <>
     {!hideHeader && <div className="relative">
@@ -65,9 +65,9 @@ export default function CourseHeaderClient({course}: {course : any}) {
           <div className="mt-4 space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Course Progress</span>
-              <span className="text-sm font-medium">{course.progress}%</span>
+              <span className="text-sm font-medium">{progress}%</span>
             </div>
-            <Progress value={course.progress} className="h-2" />
+            <Progress value={progress} className="h-2" />
             <p className="text-xs text-muted-foreground">
               {course.totalcompleted} of {course.totallessons} lessons completed
             </p>
