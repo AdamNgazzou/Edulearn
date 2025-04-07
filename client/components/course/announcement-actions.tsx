@@ -26,7 +26,7 @@ export default function AnnouncementActions({ courseId, showCreateButton = false
     setIsModalOpen(false)
   }
 
-  const handleSubmit = async (announcementData: any) => {
+  const handleSubmit =  (announcementData: any) => {
     try {
       // In a real app, you would make an API call to add/edit the announcement
       // const response = await fetch(`/api/courses/${courseId}/announcements`, {

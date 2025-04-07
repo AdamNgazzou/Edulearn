@@ -166,3 +166,62 @@ exports.getinfoCourse = async (req, res) => {
         if (client) client.release(); // Ensure the connection is released
     }
 };
+
+exports.PostAnnouncement = async (req, res) => {
+    // get courseId and other needed things
+    let client;
+    const courseId = req.params.id;
+    const { title, content } = req.body;
+    // Validate input
+    if (!courseId || isNaN(courseId) || courseId <= 0) {
+        return res.status(400).json({ success: false, message: "Invalid course ID" });
+    }
+
+    try {
+        client = await db.connect();
+
+        // Query to post information of a announcement by courseid
+        const query = `
+            INSERT INTO announcements (course_id, title, content) VALUES ($1, $2, $3)
+        `;
+        const { rows } = await client.query(query, [courseId, title, content]);
+
+        // Return the annoucement data
+        res.status(200).json({ success: true, data: rows[0] });
+    } catch (error) {
+        console.error("Error fetching course:", error.message);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    } finally {
+        if (client) client.release(); // Ensure the connection is released
+    }
+};
+exports.GetAnnouncement = async (req, res) => {
+    // get courseId and other needed things
+    let client;
+    const courseId = req.params.id;
+    // Validate input
+    if (!courseId || isNaN(courseId) || courseId <= 0) {
+        return res.status(400).json({ success: false, message: "Invalid course ID" });
+    }
+
+    try {
+        client = await db.connect();
+
+        // Query to post information of a announcement by courseid
+        const query = `
+            select * from announcements where course_id=$1        `;
+        const { rows } = await client.query(query, [courseId]);
+        // Check if  are found
+        if (rows.length === 0) {
+            return res.status(404).json({ success: false, message: "No Students found for this courseid" });
+        }
+
+        // Return the annoucement data
+        res.status(200).json({ success: true, data: rows });
+    } catch (error) {
+        console.error("Error fetching course:", error.message);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    } finally {
+        if (client) client.release(); // Ensure the connection is released
+    }
+};
