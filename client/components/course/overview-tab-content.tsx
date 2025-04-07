@@ -1,9 +1,9 @@
-import OverviewTabContentClient from "./overview-tabClient"
+import OverviewTabContentServer from "./OverviewTabContentServer"
 
 // This is a server component that fetches its own data
 export default async function OverviewTabWrapper({ courseId }: { courseId: string }) {
   const { AnnouncementData } = await getOverviewData(courseId)
-  return <OverviewTabContentClient courseId={courseId} AnnouncementData={AnnouncementData} />
+  return <OverviewTabContentServer courseId={courseId} AnnouncementData={AnnouncementData} />
 }
 
 // Mock function to get overview data

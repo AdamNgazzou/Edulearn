@@ -71,7 +71,6 @@ export default function CurriculumContent({ modules, courseId }: CurriculumConte
       //   headers: { "Content-Type": "application/json" },
       //   body: JSON.stringify(moduleData),
       // })
-
       // For now, we'll just simulate success
       toast({
         title: editMode === "add" ? "Module added" : "Module updated",

@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import { AnnouncementModal } from "@/components/modals/announcement-modal"
-import { toast } from "@/hooks/use-toast"
+import { useToast } from "@/hooks/use-toast" // ✅ fixed import
 
 interface AnnouncementActionsProps {
   courseId: string
@@ -16,6 +16,8 @@ export default function AnnouncementActions({ courseId, showCreateButton = false
   const [editMode, setEditMode] = useState<"add" | "edit">("add")
   const [initialData, setInitialData] = useState<any>(null)
 
+  const { toast } = useToast(); // ✅ use the hook here
+
   const openAddModal = () => {
     setEditMode("add")
     setInitialData(null)
@@ -26,39 +28,38 @@ export default function AnnouncementActions({ courseId, showCreateButton = false
     setIsModalOpen(false)
   }
 
-  const handleSubmit =  async (announcementData: any) => {
+  const handleSubmit = async (announcementData: any) => {
     try {
-      // In a real app, you would make an API call to add/edit the announcement
-       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/teacher/announcement/${courseId}`, {
-         method: editMode === "add" ? "POST" : "PUT",
-         headers: { "Content-Type": "application/json" },
-         body: JSON.stringify(announcementData),
-       })
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/teacher/announcement/${courseId}`, {
+        method: editMode === "add" ? "POST" : "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(announcementData),
+      });
 
-      // For now, we'll just simulate success
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Failed to save announcement");
+      }
+
       toast({
         title: editMode === "add" ? "Announcement added" : "Announcement updated",
         description:
           editMode === "add"
             ? "The announcement has been added to your course"
             : "The announcement has been updated successfully",
-      })
+      });
 
-      closeModal()
-      const data = await response.json()
-      if (data.success) {
-        window.location.reload()
-      }
-      // In a real app, you would refresh the data here
-      // This would trigger a re-fetch of the server component
+      closeModal();
+      window.location.reload();
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to save announcement",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   return (
     <>
@@ -81,6 +82,5 @@ export default function AnnouncementActions({ courseId, showCreateButton = false
         initialData={initialData}
       />
     </>
-  )
+  );
 }
-
