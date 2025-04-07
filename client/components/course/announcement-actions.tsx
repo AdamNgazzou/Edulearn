@@ -26,14 +26,14 @@ export default function AnnouncementActions({ courseId, showCreateButton = false
     setIsModalOpen(false)
   }
 
-  const handleSubmit =  (announcementData: any) => {
+  const handleSubmit =  async (announcementData: any) => {
     try {
       // In a real app, you would make an API call to add/edit the announcement
-      // const response = await fetch(`/api/courses/${courseId}/announcements`, {
-      //   method: editMode === "add" ? "POST" : "PUT",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify(announcementData),
-      // })
+       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/teacher/announcement/${courseId}`, {
+         method: editMode === "add" ? "POST" : "PUT",
+         headers: { "Content-Type": "application/json" },
+         body: JSON.stringify(announcementData),
+       })
 
       // For now, we'll just simulate success
       toast({
@@ -45,7 +45,10 @@ export default function AnnouncementActions({ courseId, showCreateButton = false
       })
 
       closeModal()
-
+      const data = await response.json()
+      if (data.success) {
+        window.location.reload()
+      }
       // In a real app, you would refresh the data here
       // This would trigger a re-fetch of the server component
     } catch (error) {

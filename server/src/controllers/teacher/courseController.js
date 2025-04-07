@@ -211,10 +211,63 @@ exports.GetAnnouncement = async (req, res) => {
         const query = `
             select * from announcements where course_id=$1        `;
         const { rows } = await client.query(query, [courseId]);
-        // Check if  are found
-        if (rows.length === 0) {
-            return res.status(404).json({ success: false, message: "No Students found for this courseid" });
-        }
+
+        // Return the annoucement data
+        res.status(200).json({ success: true, data: rows });
+    } catch (error) {
+        console.error("Error fetching course:", error.message);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    } finally {
+        if (client) client.release(); // Ensure the connection is released
+    }
+};
+
+exports.DeleteAnnouncement = async (req, res) => {
+    // delete courseId and other needed things
+    let client;
+    const announcementId = req.params.id;
+    // Validate input
+    if (!announcementId || isNaN(announcementId) || announcementId <= 0) {
+        return res.status(400).json({ success: false, message: "Invalid course ID" });
+    }
+
+    try {
+        client = await db.connect();
+
+        // Query to delete information of a announcement by announcementId
+        const query = `delete  from announcements where id=$1 `;
+        await client.query(query, [announcementId]);
+
+        // Return the annoucement data
+        res.status(200).json({ success: true });
+    } catch (error) {
+        console.error("Error fetching course:", error.message);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    } finally {
+        if (client) client.release(); // Ensure the connection is released
+    }
+};
+exports.ModifyAnnouncement = async (req, res) => {
+    // modify announcement
+    let client;
+    const announcementId = req.params.id;
+    const { title, content } = req.body;
+    // Validate input
+    if (!announcementId || isNaN(announcementId) || announcementId <= 0) {
+        return res.status(400).json({ success: false, message: "Invalid announcementId ID" });
+    }
+
+    try {
+        client = await db.connect();
+
+        // Query to modify information of a announcement by announcementid
+        const query = `
+            UPDATE announcements 
+            SET title = $2, content = $3 
+            WHERE id = $1 
+            RETURNING *
+        `;
+        const { rows } = await client.query(query, [announcementId, title, content]);
 
         // Return the annoucement data
         res.status(200).json({ success: true, data: rows });

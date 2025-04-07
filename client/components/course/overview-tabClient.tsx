@@ -28,36 +28,43 @@ export default  function OverviewTabContentClient({ courseId,AnnouncementData }:
   const closeModal = () => {
     setIsModalOpen(false)
   }
-  const handleSubmit = async (announcementData: any) => {
+  const handleSubmit = async (formData: any) => {
     try {
-      // In a real app, you would make an API call to add/edit the announcement
-      // const response = await fetch(`/api/courses/${courseId}/announcements`, {
-      //   method: editMode === "add" ? "POST" : "PUT",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify(announcementData),
-      // })
-
-      // For now, we'll just simulate success
+      const isEdit = editMode === "edit";
+      const announcementId =  AnnouncementData.data[index]?.id ;
+  
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/teacher/announcement/${announcementId}`, {
+        method:  "PUT" ,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: formData.title,
+          content: formData.content
+        }),
+      });
+  
+      const resData = await response.json();
+  
+      if (!response.ok || !resData.success) {
+        throw new Error(resData.message || "Something went wrong");
+      }
+  
       toast({
-        title: editMode === "add" ? "Announcement added" : "Announcement updated",
-        description:
-          editMode === "add"
-            ? "The announcement has been added to your course"
-            : "The announcement has been updated successfully",
-      })
-
-      closeModal()
-
-      // In a real app, you would refresh the data here
-      // This would trigger a re-fetch of the server component
-    } catch (error) {
+        title: isEdit ? "Announcement updated" : "Announcement added",
+        description: isEdit
+          ? "The announcement has been updated successfully"
+          : "The announcement has been added to your course",
+      });
+  
+      closeModal();
+      window.location.reload(); // Refresh to show updated data
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: "Failed to save announcement",
+        description: error.message || "Failed to save announcement",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
   return (
     <div className="space-y-6 pt-4">
       <Card>
