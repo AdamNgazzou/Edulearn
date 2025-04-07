@@ -1,6 +1,6 @@
-# 🎓 NextLMS — A Modern Learning Management System
+# 🎓 EduLearn — A Modern Learning Management System
 
-Welcome to **NextLMS**, a full-stack Learning Management System (LMS) built for educational institutions and course creators. It empowers instructors to manage courses, lessons, students, and track performance, while students enjoy an organized platform to learn and grow.
+Welcome to **EduLearn**, a full-stack Learning Management System (LMS) built for educational institutions and course creators. It empowers instructors to manage courses, lessons, students, and track performance, while students enjoy an organized platform to learn and grow.
 
 ## 🚀 Features
 
