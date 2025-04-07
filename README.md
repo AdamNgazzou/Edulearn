@@ -65,6 +65,19 @@ Includes relational PostgreSQL tables:
 - PDF generation for completion certificates
 - CI/CD with GitHub Actions
 
+
+## 🔑 Environment Variables
+```bash
+  FRONTEND:
+  NEXT_PUBLIC_BACKEND_API_URL=""
+
+  Backend:
+  PGHOST='*****************************************'
+  PGDATABASE='****************************************'
+  PGUSER='****************************************'
+  PGPASSWORD='****************************************'
+  JWT_SECRET='****************************************'
+```
 ## 👨‍💻 Installation (Dev Mode)
 
 ```bash
@@ -80,3 +93,6 @@ npm run dev
 cd ../client
 npm install
 npm run dev
+
+
+
