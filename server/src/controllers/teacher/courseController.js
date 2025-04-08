@@ -126,6 +126,7 @@ exports.getinfoCourse = async (req, res) => {
                 c.id ,
                 c.is_published,
                 c.level,
+                c.price,
                 c.description,
                 c.category,
                 c.image_url,
@@ -149,6 +150,38 @@ exports.getinfoCourse = async (req, res) => {
                 c.id = $1
             GROUP BY 
                 c.id, c.title, c.is_published, c.level, c.description, c.category, c.duration, c.updated_at
+        `;
+        const { rows } = await client.query(query, [courseId]);
+
+        // Check if  are found
+        if (rows.length === 0) {
+            return res.status(404).json({ success: false, message: "No information found for this course" });
+        }
+
+        // Return the course
+        res.status(200).json({ success: true, data: rows[0] });
+    } catch (error) {
+        console.error("Error fetching course:", error.message);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    } finally {
+        if (client) client.release(); // Ensure the connection is released
+    }
+};
+exports.ModifyinfoCourse = async (req, res) => {
+    // update info of a Course
+    let client;
+    const courseId = req.params.id;
+
+    // Validate input
+    if (!courseId || isNaN(courseId) || courseId <= 0) {
+        return res.status(400).json({ success: false, message: "Invalid course ID" });
+    }
+
+    try {
+        client = await db.connect();
+
+        // Query to modify information of a course by courseid
+        const query = `
         `;
         const { rows } = await client.query(query, [courseId]);
 
@@ -211,7 +244,10 @@ exports.GetAnnouncement = async (req, res) => {
         const query = `
             select * from announcements where course_id=$1        `;
         const { rows } = await client.query(query, [courseId]);
-
+        // Check if  are found
+        if (rows.length === 0) {
+            return res.status(404).json({ success: false, message: "No information found for this course" });
+        }
         // Return the annoucement data
         res.status(200).json({ success: true, data: rows });
     } catch (error) {
@@ -271,6 +307,149 @@ exports.ModifyAnnouncement = async (req, res) => {
 
         // Return the annoucement data
         res.status(200).json({ success: true, data: rows });
+    } catch (error) {
+        console.error("Error fetching course:", error.message);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    } finally {
+        if (client) client.release(); // Ensure the connection is released
+    }
+};
+
+exports.GetCourseModulesLessons = async (req, res) => {
+    // get course modules and lessons
+    let client;
+    const courseId = req.params.id;
+    // Validate input
+    if (!courseId || isNaN(courseId) || courseId <= 0) {
+        return res.status(400).json({ success: false, message: "Invalid course ID" });
+    }
+
+    try {
+        client = await db.connect();
+
+        // Query to get information of a modules and lessons by courseId
+        const query = `
+            SELECT 
+                m.id ,
+                m.title ,
+                m.description ,
+                m.is_published,
+                json_agg(
+                    json_build_object(
+                        'id', l.id,
+                        'title', l.title,
+                        'type', CASE 
+                            WHEN tl.id IS NOT NULL THEN 'text'
+                            WHEN vl.id IS NOT NULL THEN 'video'
+                            WHEN al.id IS NOT NULL THEN 'assignment'
+                        END,
+                        'duration', l.duration
+                    )
+                ) AS lessons
+            FROM 
+                modules m
+            LEFT JOIN lessons l ON m.id = l.module_id
+            LEFT JOIN text_lessons tl ON l.id = tl.lesson_id
+            LEFT JOIN video_lessons vl ON l.id = vl.lesson_id
+            LEFT JOIN assignment_lessons al ON l.id = al.lesson_id
+            WHERE 
+                m.course_id = $1
+            GROUP BY 
+                m.id, m.title, m.description, m.is_published
+        `;
+        const { rows } = await client.query(query, [courseId]);
+        // Check if  are found
+        if (rows.length === 0) {
+            return res.status(404).json({ success: false, message: "No information found for this course" });
+        }
+        // Return the course data
+        res.status(200).json({ success: true, data: rows });
+    } catch (error) {
+        console.error("Error fetching course:", error.message);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    } finally {
+        if (client) client.release(); // Ensure the connection is released
+    }
+};
+
+exports.PostModule = async (req, res) => {
+    // post course module 
+    let client;
+    const courseId = req.params.id;
+    const { title, description, is_published } = req.body;
+    // Validate input
+    if (!courseId || isNaN(courseId) || courseId <= 0) {
+        return res.status(400).json({ success: false, message: "Invalid course ID" });
+    }
+
+    try {
+        client = await db.connect();
+
+        // Query to post information of a modules 
+        const query = `
+            insert into modules (course_id,title,description,is_published)
+            values ($1,$2,$3,$4) returning * ;
+        `;
+        const { rows } = await client.query(query, [courseId, title, description, is_published]);
+
+        // Return the modues posted data
+        res.status(200).json({ success: true, data: rows });
+    } catch (error) {
+        console.error("Error fetching course:", error.message);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    } finally {
+        if (client) client.release(); // Ensure the connection is released
+    }
+};
+
+exports.ModifyModule = async (req, res) => {
+    // modify course module 
+    let client;
+    const ModuleId = req.params.id;
+    const { title, description, is_published } = req.body;
+    console.log("yurico", title, description, is_published);
+    // Validate input
+    if (!ModuleId || isNaN(ModuleId) || ModuleId <= 0) {
+        return res.status(400).json({ success: false, message: "Invalid course ID" });
+    }
+
+    try {
+        client = await db.connect();
+
+        // Query to modify information of a modules 
+        const query = `
+            UPDATE modules SET title = $2, description = $3, is_published = $4 WHERE id = $1 returning *;
+        `;
+        const { rows } = await client.query(query, [ModuleId, title, description, is_published]);
+
+        // Return the modues modified data
+        res.status(200).json({ success: true, data: rows });
+    } catch (error) {
+        console.error("Error fetching course:", error.message);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    } finally {
+        if (client) client.release(); // Ensure the connection is released
+    }
+};
+
+exports.DeleteModule = async (req, res) => {
+    // delete course module 
+    let client;
+    const ModuleId = req.params.id;
+    const { title, description, is_published } = req.body;
+    // Validate input
+    if (!ModuleId || isNaN(ModuleId) || ModuleId <= 0) {
+        return res.status(400).json({ success: false, message: "Invalid course ID" });
+    }
+
+    try {
+        client = await db.connect();
+
+        // Query to delete information of a modules 
+        const query = `delete from modules where id=$1;`;
+        await client.query(query, [ModuleId]);
+
+        res.status(200).json({ success: true });
     } catch (error) {
         console.error("Error fetching course:", error.message);
         res.status(500).json({ success: false, message: "Internal Server Error" });

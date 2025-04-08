@@ -27,11 +27,11 @@ import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { toast } from "@/hooks/use-toast"
 import { ModuleModal } from "@/components/modals/module-modal"
 import { LessonModal } from "@/components/modals/lesson-modal"
 import { ResourceModal } from "@/components/modals/resource-modal"
 import { AnnouncementModal } from "@/components/modals/announcement-modal"
+import { toast } from "react-toastify"
 
 
 
@@ -76,10 +76,7 @@ export default function CourseHeader({courseData}: any) {
   const handleCourseSave = () => {
     setCourse(editedCourse)
     setIsEditing(false)
-    toast({
-      title: "Course updated",
-      description: "Your changes have been saved successfully",
-    })
+    toast.success("Course updated")
   }
 
   const handleCourseCancel = () => {
@@ -420,20 +417,13 @@ export default function CourseHeader({courseData}: any) {
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="category">Category</Label>
-                          <Select
-                            value={editedCourse.category}
-                            onValueChange={(value) => handleSelectChange("category", value)}
-                          >
-                            <SelectTrigger id="category">
-                              <SelectValue placeholder="Select category" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="web-development">Web Development</SelectItem>
-                              <SelectItem value="programming">Programming</SelectItem>
-                              <SelectItem value="data-science">Data Science</SelectItem>
-                              <SelectItem value="design">Design</SelectItem>
-                            </SelectContent>
-                          </Select>
+                            <Input
+                              id="category"
+                              name="category"
+                              value={editedCourse.category}
+                              onChange={handleCourseChange}
+                              placeholder="Enter course category"
+                            />
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
