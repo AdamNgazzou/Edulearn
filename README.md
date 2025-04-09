@@ -2,6 +2,15 @@
 
 Welcome to **EduLearn**, a full-stack Learning Management System (LMS) built for educational institutions and course creators. It empowers instructors to manage courses, lessons, students, and track performance, while students enjoy an organized platform to learn and grow.
 
+## 🚀 Trial Accounts
+
+- Teacher 
+    Email : robert.smith@example.com
+    Password : strongpassword123
+- Student
+    Email : alice@example.com
+    Password : securepassword
+  
 ## 🚀 Features
 
 ### 👨‍🏫 Instructor Features
