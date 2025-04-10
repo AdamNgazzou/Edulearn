@@ -1,6 +1,6 @@
 const express = require("express");
 const { getProfileOfTeacher, getCoursesOfTeacher, getStudentsOfAllCourses, getStudentsOfCourse } = require("../controllers/teacher/teacherController");
-const { getResourcesCourseTeacher, getStudentsOfCoursetab, getinfoCourse, PostAnnouncement, GetAnnouncement, DeleteAnnouncement, ModifyAnnouncement, GetCourseModulesLessons, PostModule, ModifyModule, DeleteModule } = require("../controllers/teacher/courseController");
+const { getResourcesCourseTeacher, getStudentsOfCoursetab, getinfoCourse, PostAnnouncement, GetAnnouncement, DeleteAnnouncement, ModifyAnnouncement, GetCourseModulesLessons, PostModule, ModifyModule, DeleteModule, ModifyinfoCourse, PostLesson, PostLessonVideo, PostLessonText, PostLessonAssignement } = require("../controllers/teacher/courseController");
 
 const router = express.Router();
 
@@ -12,6 +12,8 @@ router.get("/studentsOfCourse/:id", getStudentsOfCourse);
 router.get("/resourcesCourse/:id", getResourcesCourseTeacher);
 router.get("/studentsCourse/:id", getStudentsOfCoursetab);
 router.get("/infocourse/:id", getinfoCourse);
+router.put("/infocourse/:id", ModifyinfoCourse);
+
 
 router.get("/announcement/:id", GetAnnouncement);
 router.post("/announcement/:id", PostAnnouncement);
@@ -24,6 +26,11 @@ router.post("/module/:id", PostModule);
 router.put("/module/:id", ModifyModule);
 router.delete("/module/:id", DeleteModule);
 
+
+router.post("/lesson/:id", PostLesson);
+router.post("/lessonVideo/:id", PostLessonVideo);
+router.post("/lessonText/:id", PostLessonText);
+router.post("/lessonAssignement/:id", PostLessonAssignement);
 
 
 

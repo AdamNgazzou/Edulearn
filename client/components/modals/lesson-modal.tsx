@@ -38,7 +38,7 @@ export function LessonModal({ isOpen, onClose, onSubmit, editMode, initialData }
     duration: "",
     content: {
       videoUrl: "",
-      textContent: "",
+      sections: [{ title: "", content: "" }],
       assignmentDetails: {
         description: "",
         dueDate: new Date().toISOString().split("T")[0],
@@ -46,7 +46,7 @@ export function LessonModal({ isOpen, onClose, onSubmit, editMode, initialData }
         instructions: "",
       },
       quizQuestions: [],
-    },
+    }    
   }
 
   const [formData, setFormData] = useState(initialData || defaultData)
@@ -96,6 +96,40 @@ export function LessonModal({ isOpen, onClose, onSubmit, editMode, initialData }
     e.preventDefault()
     onSubmit(formData)
   }
+  const handleSectionChange = (index: number, field: "title" | "content", value: string) => {
+    const updatedSections = [...formData.content.sections]
+    updatedSections[index][field] = value
+    setFormData((prev) => ({
+      ...prev,
+      content: {
+        ...prev.content,
+        sections: updatedSections,
+      },
+    }))
+  }
+  
+  const handleAddSection = () => {
+    setFormData((prev) => ({
+      ...prev,
+      content: {
+        ...prev.content,
+        sections: [...prev.content.sections, { title: "", content: "" }],
+      },
+    }))
+  }
+  
+  const handleRemoveSection = (index: number) => {
+    const updatedSections = [...formData.content.sections]
+    updatedSections.splice(index, 1)
+    setFormData((prev) => ({
+      ...prev,
+      content: {
+        ...prev.content,
+        sections: updatedSections,
+      },
+    }))
+  }
+  
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -106,6 +140,7 @@ export function LessonModal({ isOpen, onClose, onSubmit, editMode, initialData }
             {editMode === "add" ? "Create a new lesson for this module." : "Make changes to your existing lesson."}
           </DialogDescription>
         </DialogHeader>
+        <div className="overflow-y-auto max-h-[65vh] pr-2">
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
@@ -157,19 +192,37 @@ export function LessonModal({ isOpen, onClose, onSubmit, editMode, initialData }
               </div>
             )}
 
-            {formData.type === "text" && (
-              <div className="grid gap-2">
-                <Label htmlFor="textContent">Content</Label>
-                <Textarea
-                  id="textContent"
-                  name="textContent"
-                  value={formData.content.textContent || ""}
-                  onChange={handleContentChange}
-                  placeholder="Enter lesson content"
-                  rows={5}
-                />
-              </div>
-            )}
+{formData.type === "text" && (
+  <div className="grid gap-2">
+    <Label>Sections</Label>
+    {formData.content.sections.map((section, index) => (
+      <div key={index} className="border p-2 rounded-md space-y-2">
+        <Input
+          placeholder="Section Title"
+          value={section.title}
+          onChange={(e) => handleSectionChange(index, "title", e.target.value)}
+        />
+        <Textarea
+          placeholder="Section Content"
+          value={section.content}
+          onChange={(e) => handleSectionChange(index, "content", e.target.value)}
+          rows={4}
+        />
+        <Button
+          type="button"
+          variant="destructive"
+          onClick={() => handleRemoveSection(index)}
+          className="w-fit"
+        >
+          Remove Section
+        </Button>
+      </div>
+    ))}
+    <Button type="button" onClick={handleAddSection}>
+      Add Section
+    </Button>
+  </div>
+)}
 
             {formData.type === "assignment" && (
               <>
@@ -230,6 +283,7 @@ export function LessonModal({ isOpen, onClose, onSubmit, editMode, initialData }
             <Button type="submit">{editMode === "add" ? "Add Lesson" : "Save Changes"}</Button>
           </DialogFooter>
         </form>
+        </div>  
       </DialogContent>
     </Dialog>
   )

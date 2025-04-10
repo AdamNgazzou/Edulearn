@@ -28,7 +28,7 @@ interface ResourceModalProps {
     title: string
     type: string
     description: string
-    content: any
+    url: any
   }
 }
 

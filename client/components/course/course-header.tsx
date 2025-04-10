@@ -60,23 +60,40 @@ export default function CourseHeader({courseData}: any) {
   // Temporary edit states
   const [editedCourse, setEditedCourse] = useState(course)
 
-  // Fetch course data
-  useEffect(() => {
-    // In a real app, this would fetch the course data from an API
-    // For now, we'll use the mock data
-    setCourse(courseData)
-    setEditedCourse(courseData)
-  }, [courseId])
+
 
   // Handle course edit
   const handleCourseEdit = () => {
     setIsEditing(true)
   }
 
-  const handleCourseSave = () => {
+  const handleCourseSave = async () => {
     setCourse(editedCourse)
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/teacher/infocourse/${courseId}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title : editedCourse.title,
+            description: editedCourse.description,
+            category : editedCourse.category, 
+            level : editedCourse.level , 
+            duration : editedCourse.duration ,
+            price : editedCourse.price,
+            is_published : editedCourse.is_published,
+          }),
+        }
+      )
+      toast.success("Course updated");
+
+    } catch (error) {
+      toast.error("Failed to create module.");
+
+    }
+
     setIsEditing(false)
-    toast.success("Course updated")
   }
 
   const handleCourseCancel = () => {
@@ -332,7 +349,7 @@ export default function CourseHeader({courseData}: any) {
                   </Link>
                 </Button>
                 <div>
-                  <h1 className="text-3xl font-bold tracking-tight">{courseData.title}</h1>
+                  <h1 className="text-3xl font-bold tracking-tight">{editedCourse.title}</h1>
                   <p className="text-muted-foreground">
                     <Link href="/teacher/courses" className="hover:underline">
                       My Courses
@@ -371,7 +388,7 @@ export default function CourseHeader({courseData}: any) {
             <div className="grid gap-6 md:grid-cols-[2fr_1fr]">
               <div className="relative rounded-lg overflow-hidden border">
                 <div className="relative h-[200px] w-full">
-                  <Image src={courseData.image || "/placeholder.svg"} alt={courseData.title} fill className="object-cover" />
+                  <Image src={editedCourse.image || "/placeholder.svg"} alt={editedCourse.title} fill className="object-cover" />
                   {isEditing && (
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                       <Button variant="secondary">
@@ -453,19 +470,19 @@ export default function CourseHeader({courseData}: any) {
                   ) : (
                     <div className="space-y-4">
                       <div className="flex items-center gap-2">
-                        <Badge variant={courseData.is_published ? "default" : "secondary"}>
-                          {courseData.is_published ? "Published" : "Draft"}
+                        <Badge variant={editedCourse.is_published ? "default" : "secondary"}>
+                          {editedCourse.is_published ? "Published" : "Draft"}
                         </Badge>
-                        <Badge variant="outline">{courseData.level}</Badge>
+                        <Badge variant="outline">{editedCourse.level}</Badge>
                         <Badge variant="outline" className="capitalize">
-                          {courseData.category.replace("-", " ")}
+                          {editedCourse.category.replace("-", " ")}
                         </Badge>
                       </div>
-                      <p className="text-muted-foreground">{courseData.description}</p>
+                      <p className="text-muted-foreground">{editedCourse.description}</p>
                       <div className="grid grid-cols-2 gap-4 text-sm">
                         <div className="flex items-center gap-2">
                           <Clock className="h-4 w-4 text-muted-foreground" />
-                          <span>{courseData.duration}</span>
+                          <span>{editedCourse.duration}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <Users className="h-4 w-4 text-muted-foreground" />
@@ -477,7 +494,7 @@ export default function CourseHeader({courseData}: any) {
                         </div>
                         <div className="flex items-center gap-2">
                           <Calendar className="h-4 w-4 text-muted-foreground" />
-                          <span>Last updated: {new Date(courseData.updated_at).toLocaleDateString()}</span>
+                          <span>Last updated: {new Date(editedCourse.updated_at).toLocaleDateString()}</span>
                         </div>
                       </div>
                     </div>

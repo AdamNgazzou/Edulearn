@@ -24,7 +24,7 @@ export default function ResourcesContent({ resources,coursesData, courseId }: Re
     setSelectedResourceId(resourceId || null)
 
     if (mode === "edit" && resourceId) {
-      const resource = resources.find((r) => r.id === resourceId)
+      const resource = coursesData.data.find((r) => r.id === resourceId)
       setInitialData(resource)
     } else {
       setInitialData(null)
