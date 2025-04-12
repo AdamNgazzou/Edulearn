@@ -50,7 +50,7 @@ Includes relational PostgreSQL tables:
 - `video_lessons`, `text_lessons`, `assignment_lessons`
 - `resources`, `announcements`, `enrollments`, `attendance`
 
-> Full SQL schema is available in `/schema/schema.sql`.
+> Full SQL schema is available in `/database/schema.sql`.
 
 ## 🔐 Authentication & Authorization
 
