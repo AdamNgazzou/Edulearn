@@ -6,8 +6,7 @@ const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
   title: "EduLearn - Learning Management System",
-  description: "A modern learning management system for students and teachers",
-    generator: 'v0.dev'
+  description: "A modern learning management system for students and teachers"
 }
 
 import { ReactNode } from "react";

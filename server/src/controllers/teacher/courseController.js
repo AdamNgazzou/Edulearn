@@ -387,34 +387,6 @@ exports.ModifyModule = async (req, res) => {
     }
 };
 
-
-function validateId(id, res, name = 'ID') {
-    if (!id || isNaN(id) || id <= 0) {
-        res.status(400).json({ success: false, message: `Invalid ${name}` });
-        return false;
-    }
-    return true;
-}
-
-const executeQuery = async (res, query, params, successCallback) => {
-    let client;
-    try {
-        client = await db.connect();
-        const { rows } = await client.query(query, params);
-
-        if (rows.length === 0) {
-            return res.status(404).json({ success: false, message: "No results found" });
-        }
-
-        successCallback(rows);
-    } catch (error) {
-        console.error("Database error:", error.message);
-        res.status(500).json({ success: false, message: "Internal Server Error" });
-    } finally {
-        if (client) client.release();
-    }
-};
-
 exports.PostLesson = async (req, res) => {
     // post course lesson 
     let client;
@@ -484,7 +456,7 @@ exports.PostLessonText = async (req, res) => {
         // Query to post information of a lesson 
         const query = `
             insert into text_lessons (lesson_id,description,sections) VALUES($1,$2,$3) RETURNING * ;      `;
-        const { rows } = await client.query(query, [lessonId, description, sections]);
+        const { rows } = await client.query(query, [lessonId, description, JSON.stringify(sections)]);
 
         // Return the modues posted data
         res.status(200).json({ success: true, data: rows[0] });
@@ -510,7 +482,7 @@ exports.PostLessonAssignement = async (req, res) => {
 
         // Query to post information of a lesson 
         const query = `
-            insert into assignement_lessons(lesson_id,description,instructions,points,due_date) Values($1,$2,$3,$4,$5) RETURNING * ;      `;
+            insert into assignment_lessons(lesson_id,description,instructions,points,due_date) Values($1,$2,$3,$4,$5) RETURNING * ;      `;
         const { rows } = await client.query(query, [lessonId, description, instructions, points, due_date]);
 
         // Return the modues posted data
@@ -520,5 +492,70 @@ exports.PostLessonAssignement = async (req, res) => {
         res.status(500).json({ success: false, message: "Internal Server Error" });
     } finally {
         if (client) client.release(); // Ensure the connection is released
+    }
+};
+
+exports.DeleteLesson = async (req, res) => {
+    // delete course lesson 
+    let client;
+    const LessonId = req.params.id;
+    // Validate input
+    if (!validateId(LessonId, res, 'Lesson ID')) return;
+
+
+    try {
+        client = await db.connect();
+
+        // Query to post information of a lesson 
+        const query = `
+            DELETE from lessons where id = $1 ; 
+        `;
+        await client.query(query, [LessonId]);
+
+        // Return the modues posted data
+        res.status(200).json({ success: true });
+    } catch (error) {
+        console.error("Error DELETING course:", error.message);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    } finally {
+        if (client) client.release(); // Ensure the connection is released
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+function validateId(id, res, name = 'ID') {
+    if (!id || isNaN(id) || id <= 0) {
+        res.status(400).json({ success: false, message: `Invalid ${name}` });
+        return false;
+    }
+    return true;
+}
+
+const executeQuery = async (res, query, params, successCallback) => {
+    let client;
+    try {
+        client = await db.connect();
+        const { rows } = await client.query(query, params);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ success: false, message: "No results found" });
+        }
+
+        successCallback(rows);
+    } catch (error) {
+        console.error("Database error:", error.message);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    } finally {
+        if (client) client.release();
     }
 };

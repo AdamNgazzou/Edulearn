@@ -1,6 +1,6 @@
 const express = require("express");
 const { getProfileOfTeacher, getCoursesOfTeacher, getStudentsOfAllCourses, getStudentsOfCourse } = require("../controllers/teacher/teacherController");
-const { getResourcesCourseTeacher, getStudentsOfCoursetab, getinfoCourse, PostAnnouncement, GetAnnouncement, DeleteAnnouncement, ModifyAnnouncement, GetCourseModulesLessons, PostModule, ModifyModule, DeleteModule, ModifyinfoCourse, PostLesson, PostLessonVideo, PostLessonText, PostLessonAssignement } = require("../controllers/teacher/courseController");
+const { getResourcesCourseTeacher, getStudentsOfCoursetab, getinfoCourse, PostAnnouncement, GetAnnouncement, DeleteAnnouncement, ModifyAnnouncement, GetCourseModulesLessons, PostModule, ModifyModule, DeleteModule, ModifyinfoCourse, PostLesson, PostLessonVideo, PostLessonText, PostLessonAssignement, DeleteLesson } = require("../controllers/teacher/courseController");
 
 const router = express.Router();
 
@@ -28,10 +28,10 @@ router.delete("/module/:id", DeleteModule);
 
 
 router.post("/lesson/:id", PostLesson);
+router.delete("/lesson/:id", DeleteLesson);
 router.post("/lessonVideo/:id", PostLessonVideo);
 router.post("/lessonText/:id", PostLessonText);
 router.post("/lessonAssignement/:id", PostLessonAssignement);
-
 
 
 

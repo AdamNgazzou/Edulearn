@@ -41,7 +41,6 @@ export default function CurriculumContent({ moduless, courseId }: CurriculumCont
   const openModuleModal = (mode: "add" | "edit", moduleId?: string) => {
     setEditMode(mode)
     setSelectedModuleId(moduleId || null)
-
     if (mode === "edit" && moduleId) {
       const module = modules.find((m) => m.id === moduleId)
       setInitialData(module)
@@ -117,28 +116,72 @@ export default function CurriculumContent({ moduless, courseId }: CurriculumCont
 
   const handleLessonSubmit = async (lessonData: any) => {
     try {
-       //const response = await fetch(`/api/courses/${courseId}/modules/${selectedModuleId}/lessons`, {
-         //method: editMode === "add" ? "POST" : "PUT",
-        //headers: { "Content-Type": "application/json" },
-         //body: JSON.stringify(lessonData),
-       //})
-
-      // For now, we'll just simulate success
-      /*if (response.status === 200) {
-        toast.success(editMode === "add" ? "Module created successfully!" : "Module edited successfully!" )
-      } else {
-        toast.error("Failed to create module.")
-      }*/
-      closeLessonModal()
-
-
-        // Reload page or data
-    
-      } catch (error) {
-        console.error(error)
-        toast.error("Something went wrong.")
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/teacher/lesson/${selectedModuleId}`, {
+        method: editMode === "add" ? "POST" : "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(lessonData),
+      })
+  
+      if (response.status !== 200) {
+        toast.error("Failed to create lesson.")
+        return
       }
+  
+      const json = await response.json()
+      const lessonId = parseInt(json.data.id)
+  
+      const lessontype =
+        lessonData.type === "text"
+          ? "lessonText"
+          : lessonData.type === "video"
+          ? "lessonVideo"
+          : lessonData.type === "quiz"
+          ? "quiz"
+          : "lessonAssignement"
+  
+      let requestBody: any = {}
+  
+      if (lessontype === "lessonVideo") {
+        requestBody = {
+          url: lessonData.content.videoUrl,
+        }
+      } else if (lessontype === "lessonAssignement") {
+        requestBody = {
+          description: lessonData.content.assignmentDetails.description, 
+          due_date: lessonData.content.assignmentDetails.dueDate,
+          points: parseInt(lessonData.content.assignmentDetails.points),
+          instructions: lessonData.content.assignmentDetails.instructions,
+        }
+      } else if (lessontype === "lessonText") {
+        requestBody = {
+          description: lessonData.description,
+          sections: lessonData.content.sections,
+        }
+      }else {
+        console.error("Missing assignmentDetails for lessonText",lessonData);
+      }
+      console.log(lessonId);
+      console.log(lessonData);
+      const response2 = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/teacher/${lessontype}/${lessonId}`, {
+        method: editMode === "add" ? "POST" : "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody),
+      })
+  
+      if (response2.status === 200) {
+        toast.success(editMode === "add" ? "Lesson created successfully!" : "Lesson edited successfully!")
+      } else {
+        toast.error(`Failed to create ${lessontype}.`)
+      }
+  
+      closeLessonModal()
+  
+    } catch (error) {
+      console.error(error)
+      toast.error("Something went wrong.")
     }
+  }
+  
 
   const handleDeleteModule = async () => {
     if (!moduleToDelete) return
@@ -168,27 +211,28 @@ export default function CurriculumContent({ moduless, courseId }: CurriculumCont
   
 
   const handleDeleteLesson = async (moduleId: string, lessonId: string) => {
-    if (confirm("Are you sure you want to delete this lesson? This action cannot be undone.")) {
-      try {
-        // await fetch(`/api/courses/${courseId}/modules/${moduleId}/lessons/${lessonId}`, {
-        //   method: "DELETE",
-        // })
-
-        // For now, we'll just simulate success
-        toast({
-          title: "Lesson deleted",
-          description: "The lesson has been removed from the module",
-        })
-
-        // In a real app, you would refresh the data here
-        // This would trigger a re-fetch of the server component
-      } catch (error) {
-        toast({
-          title: "Error",
-          description: "Failed to delete lesson",
-          variant: "destructive",
-        })
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/teacher/lesson/${lessonId}`, {
+        method: "DELETE",
+      })
+  
+      if (response.status === 200) {
+        toast.success("lesson has been Deleted Successfully!" )
+        setModules((prev) =>
+          prev.map((module) =>
+            module.id === moduleId
+              ? { ...module, lessons: module.lessons.filter((lesson: any) => lesson.id !== lessonId) }
+              : module
+          )
+        )
+      } else {
+        toast.error("Failed to delete lesson.")
       }
+      setShowDeleteDialog(false)
+  
+    } catch (error: any) {
+      toast.error("Something went wrong.")
+      setShowDeleteDialog(false)
     }
   }
 
