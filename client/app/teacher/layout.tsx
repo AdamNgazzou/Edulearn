@@ -6,10 +6,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import LoadingSpinner from "@/components/ui/loading-spinner"; // A loading spinner component
+import { Sun, Moon } from "lucide-react"
+import { useTheme } from "next-themes"
 
 export default function StudentLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { theme, setTheme } = useTheme();
+
   useEffect(() => {
     const getCookie = (name: string) => {
       const value = `; ${document.cookie}`;
@@ -65,6 +69,15 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
                 3
               </span>
             </Button>
+
+            <Button
+                  variant="outline"
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  aria-label="Toggle theme"
+                >
+                  {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </Button>
+            
             <Button
                 variant="outline"
                 size="sm"

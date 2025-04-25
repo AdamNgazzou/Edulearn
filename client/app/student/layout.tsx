@@ -5,12 +5,17 @@ import { Bell, BookOpen, ArrowLeft } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Sun, Moon } from "lucide-react"
+import { useTheme } from "next-themes"
 
 
 export default function StudentLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [isHydrated, setIsHydrated] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const { theme, setTheme } = useTheme()
+
 
   useEffect(() => {
       setIsHydrated(true); // Ensures the component is only modified after hydration
@@ -63,6 +68,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
             <Link href="/student/profile" className="text-sm font-medium transition-colors hover:text-primary">
               Profile
             </Link>
+            
           </nav>
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" className="relative">
@@ -70,6 +76,12 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
               <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
                 3
               </span>
+            </Button>
+            <Button
+                  variant="outline"
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  aria-label="Toggle theme">
+            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </Button>
             <Button
                 variant="outline"

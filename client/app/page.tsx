@@ -4,11 +4,20 @@ import Link from "next/link"
 import Image from "next/image"
 import { ArrowRight, BookOpen, Users, Award } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Sun, Moon } from "lucide-react"
+import { useTheme } from "next-themes"
 
 export default function LandingPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState<string | null>(null);
+  const { theme, setTheme } = useTheme();
 
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    // ...existing code...
+  }, []);
   useEffect(() => {
     // Helper function to get a cookie value by name
     const getCookie = (name: string) => {
@@ -77,6 +86,15 @@ export default function LandingPage() {
             )}
           </nav>
           <div className="flex items-center gap-4">
+          {mounted && (
+              <Button
+                variant="outline"
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                aria-label="Toggle theme"
+              >
+                {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              </Button>
+            )}
             {!isLoggedIn ? (
               <>
                 <Link href="/auth/login" className="text-sm font-medium transition-colors hover:text-primary">
